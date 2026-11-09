@@ -86,9 +86,10 @@ def generate_reports(input_csv: str = "data/sample_records.csv", output_dir: str
         for idx in range(1, min(6, len(findings_table.rows))):
             enc_id = findings_table.rows[idx].cells[0].text.strip()
             code = findings_table.rows[idx].cells[2].text.strip()
-            issue = findings_table.rows[idx].cells[3].text.strip()
-            sev = findings_table.rows[idx].cells[4].text.strip()
-            print(f"      - {enc_id} | Code: {code} | Issue: {issue} | Severity: {sev}")
+            year = findings_table.rows[idx].cells[3].text.strip()
+            issue = findings_table.rows[idx].cells[4].text.strip()
+            sev = findings_table.rows[idx].cells[5].text.strip()
+            print(f"      - {enc_id} | Code: {code} | Year: {year} | Issue: {issue} | Severity: {sev}")
     else:
         print(" [!] Warning: Detailed findings table not located by header match.")
 

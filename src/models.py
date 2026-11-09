@@ -27,7 +27,8 @@ class IssueType(str, Enum):
     INCOMPLETE_DOCUMENTATION = "Incomplete Clinical Documentation"
     DUPLICATE_DIAGNOSIS = "Duplicate Diagnosis Entry"
     DUPLICATE_PROCEDURE = "Duplicate Procedure Entry"
-    UNSUPPORTED_PROCEDURE = "Unsupported Procedure Coding"
+    UNSUPPORTED_PROCEDURE = "Unsupported Procedure Medical Necessity"
+    MISSING_PROCEDURE_DOCUMENTATION = "Missing Procedure Documentation"
     UNSUPPORTED_EM_LEVEL = "Unsupported E/M Level"
     UNSPECIFIED_CODE_USAGE = "Unspecified Code Warning"
     MISSING_PROVIDER_SIGNATURE = "Missing Provider Signature"
@@ -94,6 +95,7 @@ class AuditFinding:
         recommended_action: Suggested remediation for the human auditor.
         reference_guideline: Official coding or regulatory standard citation.
         manual_review_required: Always True for flagged compliance findings.
+        code_set_year: Code-set year applicable to the code (e.g. FY 2024 / 2024).
     """
     encounter_id: str
     patient_id: str
@@ -105,6 +107,7 @@ class AuditFinding:
     recommended_action: str
     reference_guideline: str
     manual_review_required: bool = True
+    code_set_year: str = "FY 2024 / 2024"
 
     # Backward compatibility alias
     @property
@@ -119,6 +122,7 @@ class AuditFinding:
             "Patient ID": self.patient_id,
             "Original Diagnosis": self.original_diagnosis or "(None Documented)",
             "Assigned Code": self.assigned_code or "(None)",
+            "Code-Set Year": self.code_set_year,
             "Audit Issue": self.audit_issue,
             "Severity": self.severity.value,
             "Reason for Flagging": self.reason,

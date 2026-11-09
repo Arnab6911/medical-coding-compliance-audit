@@ -38,7 +38,7 @@ def set_cell_background(cell, fill_hex: str) -> None:
     tcPr.append(shd)
 
 
-def set_cell_margins(cell, top: int = 100, bottom: int = 100, left: int = 140, right: int = 140) -> None:
+def set_cell_margins(cell, top: int = 100, bottom: int = 100, left: int = 120, right: int = 120) -> None:
     """Set inner cell padding in twips."""
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
@@ -169,7 +169,7 @@ class ComplianceReportGenerator:
             ("Audit Project:", "Medical Coding Compliance Audit Simulation"),
             ("Date of Audit:", datetime.now().strftime("%B %d, %Y")),
             ("Audited Records:", f"{self.summary.total_records} Fictional Encounters"),
-            ("Code Set Standards:", "ICD-10-CM (FY 2024) & CPT® (2024 Educational Subset)"),
+            ("Code Set Standards:", "ICD-10-CM (FY 2024 Standard) & CPT® (2024 Educational Reference)"),
             ("Project Level:", "Internship Submission & Academic Simulation Standard")
         ]
         for row_idx, (lbl, val) in enumerate(meta_items):
@@ -319,18 +319,26 @@ class ComplianceReportGenerator:
         self._add_section_heading("5. Scope & Limitations")
         p = self.doc.add_paragraph()
         p.add_run(
-            "Audit Scope:\n"
+            "Audit Scope & Code Set Versions:\n"
             "The audit scope is confined to outpatient physician encounter records. Evaluated code sets include "
-            "ICD-10-CM FY 2024 diagnostic codes and CPT 2024 outpatient Evaluation and Management (E/M) and common "
-            "office procedure codes (radiology, cardiology, endoscopy, and pathology).\n\n"
+            "ICD-10-CM FY 2024 diagnostic codes (effective October 1, 2023 through September 30, 2024) and CPT 2024 "
+            "outpatient Evaluation and Management (E/M) and common office procedure codes (effective January 1, 2024).\n\n"
+            "Historical vs. Current Coding Context:\n"
+            "Medical code sets undergo regular statutory revisions. ICD-10-CM updates annually on October 1st, while CPT "
+            "updates annually on January 1st. In 2021 and 2023, the American Medical Association (AMA) and CMS executed "
+            "landmark revisions to outpatient Evaluation and Management (E/M) coding, eliminating the historical 1995/1997 "
+            "scoring of history and physical exam bullet counts in favor of Medical Decision Making (MDM) or total encounter time. "
+            "This simulation applies these modernized 2021/2023 E/M documentation principles.\n\n"
             "Operational & Regulatory Limitations:\n"
             "1. Educational Simulation: This application is constructed strictly as an educational learning platform. "
             "It does not replace certified professional coding judgment (CPC, CCS, CPMA).\n"
             "2. Non-HIPAA Environment: The software operates on de-identified synthetic data only. It lacks HIPAA-certified "
             "encryption and must not receive real Protected Health Information (PHI).\n"
             "3. Codebook Coverage: The reference database encompasses an educational standard subset. Codes outside this "
-            "subset are flagged for manual verification rather than assumed invalid.\n"
-            "4. Zero Automatic Modifications: In adherence to compliance integrity standards, the audit engine is read-only "
+            "curated subset are flagged as 'Unverified Reference Code' for manual verification rather than assumed invalid.\n"
+            "4. Missing Documentation vs. Coding Error: Missing clinical documentation is flagged as an unverified service "
+            "requiring chart retrieval and provider query, rather than an automatic accusation of intentional coding fraud.\n"
+            "5. Zero Automatic Modifications: In adherence to compliance integrity standards, the audit engine is read-only "
             "and never modifies clinical documentation or billed codes."
         )
         p.paragraph_format.space_after = Pt(12)
@@ -349,11 +357,13 @@ class ComplianceReportGenerator:
             "data structures capturing encounter IDs, patient demographics, clinical notes, and assigned codes.\n"
             "2. Automated Rule Execution: Independent, modular Python validation functions inspect each encounter across "
             "missing fields, code duplication, diagnostic alignment, procedure substantiation, and E/M justification.\n"
-            "3. Severity Scoring: Each discrepancy is stratified into High (regulatory/recoupment risk), Medium (technical defect/signature gap), "
+            "3. Clinical Negation & Category Cross-Validation: Diagnosis matching does not rely solely on simple keyword search; "
+            "it evaluates clinical negation phrases (e.g. 'no history of', 'denies', 'ruled out') to eliminate false positive matches.\n"
+            "4. Severity Scoring: Each discrepancy is stratified into High (regulatory/recoupment risk), Medium (technical defect/signature gap), "
             "or Low (coding specificity optimization) severity.\n"
-            "4. Actionable Remediation Generation: For each flagged encounter, the engine synthesizes a specific corrective action "
-            "and binds an authoritative regulatory citation.\n"
-            "5. Human Adjudication Readiness: Findings are staged for human certified coding review without automated modification."
+            "5. Duplicate Finding Suppression: Emits distinct compliance issues while suppressing duplicate reporting of identical findings.\n"
+            "6. Actionable Remediation Generation: For each flagged encounter, the engine synthesizes a specific corrective action "
+            "and binds an authoritative regulatory citation."
         )
         p.paragraph_format.space_after = Pt(12)
 
@@ -371,7 +381,8 @@ class ComplianceReportGenerator:
             ("Diagnostic Alignment", "ICD-10-CM Guideline Section I.A.19 specifies that code assignment must accurately represent the condition documented by the attending clinician."),
             ("Medical Necessity", "Social Security Act § 1862(a)(1)(A) and CMS Pub 100-02 Chapter 15 §20 prohibit payment for services that are not reasonable and necessary for diagnosis or treatment."),
             ("Clinician Authentication", "CMS MLN Matters MM6698 requires a legible, compliant electronic or handwritten signature with credentials for all reimbursable encounters."),
-            ("E/M Complexity Criteria", "AMA CPT 2024 E/M guidelines require Level 5 established visits (99215) to satisfy high Medical Decision Making (MDM) or 40-54 minutes of encounter time.")
+            ("E/M Complexity Criteria", "AMA CPT 2024 E/M guidelines require Level 5 established visits (99215) to satisfy high Medical Decision Making (MDM) or 40-54 minutes of encounter time."),
+            ("Multiple Procedure Duplication", "CMS NCCI Policy Manual Chapter 1 §B requires distinct modifiers for repeatable services and prohibits unbundled duplicates.")
         ]
         for name, text in criteria:
             p_crit = self.doc.add_paragraph(style='List Bullet')
@@ -397,9 +408,10 @@ class ComplianceReportGenerator:
             f"• Encounter Identifier Format: ENC-1001 through ENC-1020\n"
             f"• Patient Age Distribution: 28 to 72 years (Mean: 50.4 years)\n"
             f"• Patient Gender Distribution: Balanced male and female fictional cohorts\n"
+            f"• Applicable Code Sets: ICD-10-CM (FY 2024) and CPT (2024)\n"
             f"• Clinical Conditions Documented: Essential hypertension, type 2 diabetes mellitus, acute pharyngitis, "
             f"severe asthma, osteoarthritis, acute bronchitis, preventive wellness, GERD, pneumonia, chest pain, and fatigue\n"
-            f"• CPT Procedures Sampled: Outpatient E/M levels 1-5, screening colonoscopy, 12-lead ECG, 2-view chest radiography, and venipuncture"
+            f"• CPT Procedures Sampled: Outpatient E/M levels 1-5, screening colonoscopy, 12-lead ECG, 2-view chest radiography, and routine venipuncture"
         )
         p.paragraph_format.space_after = Pt(12)
 
@@ -407,7 +419,7 @@ class ComplianceReportGenerator:
     # SECTION 9: DETAILED AUDIT FINDINGS WITH ENCOUNTER IDS
     # -------------------------------------------------------------------------
     def _add_section_9_detailed_findings(self) -> None:
-        """Render Section 9: Detailed Audit Findings Table."""
+        """Render Section 9: Detailed Audit Findings Table with Code-Set Year."""
         self._add_section_heading("9. Detailed Audit Findings with Encounter IDs")
 
         if not self.summary.findings:
@@ -417,19 +429,20 @@ class ComplianceReportGenerator:
 
         p_intro = self.doc.add_paragraph()
         p_intro.add_run(
-            f"A total of {len(self.summary.findings)} discrete compliance findings were identified. "
-            f"The table below itemizes every flagged encounter, the corresponding patient reference, "
-            f"assigned codes, compliance issue category, assigned severity, and specific audit rationale."
+            f"A total of {len(self.summary.findings)} discrete compliance findings were identified across "
+            f"{self.summary.records_flagged} encounter(s). The table below itemizes every flagged encounter, "
+            f"patient reference, assigned codes, applicable code-set year, issue category, assigned severity, "
+            f"and specific audit rationale."
         )
 
-        tbl = self.doc.add_table(rows=1 + len(self.summary.findings), cols=6)
+        tbl = self.doc.add_table(rows=1 + len(self.summary.findings), cols=7)
         tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
 
-        headers = ["Encounter ID", "Patient ID", "Assigned Code", "Issue Category", "Severity", "Audit Rationale & Citation"]
+        headers = ["Encounter ID", "Patient ID", "Assigned Code", "Code Set Year", "Issue Category", "Severity", "Audit Rationale & Citation"]
         for col_idx, h_text in enumerate(headers):
             cell = tbl.cell(0, col_idx)
             set_cell_background(cell, "1E3A8A")
-            set_cell_margins(cell, top=90, bottom=90, left=90, right=90)
+            set_cell_margins(cell, top=90, bottom=90, left=70, right=70)
             r = cell.paragraphs[0].add_run(h_text)
             r.font.bold = True
             r.font.size = Pt(8.5)
@@ -441,6 +454,7 @@ class ComplianceReportGenerator:
                 finding.encounter_id,
                 finding.patient_id,
                 finding.assigned_code,
+                finding.code_set_year,
                 finding.audit_issue,
                 finding.severity.value,
                 f"{finding.reason}\n\nGuideline: {finding.reference_guideline}"
@@ -448,14 +462,14 @@ class ComplianceReportGenerator:
             for col_idx, text in enumerate(col_data):
                 cell = tbl.cell(row_idx, col_idx)
                 set_cell_background(cell, bg)
-                set_cell_margins(cell, top=60, bottom=60, left=70, right=70)
+                set_cell_margins(cell, top=60, bottom=60, left=60, right=60)
                 p = cell.paragraphs[0]
                 r = p.add_run(text)
                 r.font.size = Pt(8)
 
                 if col_idx == 0:
                     r.font.bold = True
-                elif col_idx == 4:
+                elif col_idx == 5:
                     r.font.bold = True
                     if finding.severity == AuditSeverity.HIGH:
                         r.font.color.rgb = ALERT_RED
@@ -477,7 +491,6 @@ class ComplianceReportGenerator:
             "Below is a detailed analysis of each compliance issue category identified by the audit engine:\n"
         )
 
-        # Build issue category frequency dictionary
         issues_map: Dict[str, List[AuditFinding]] = {}
         for f in self.summary.findings:
             issues_map.setdefault(f.audit_issue, []).append(f)
@@ -488,10 +501,13 @@ class ComplianceReportGenerator:
                 "For example, in encounter ENC-1002, Essential Hypertension was documented, but E11.9 (Type 2 Diabetes) "
                 "was assigned. Such mismatches distort clinical registries, alter risk adjustment scores (HCCs), and cause claim audits."
             ),
-            "Unsupported Procedure Coding": (
-                "Identified when CPT procedural codes are billed without supporting documentation in the chart or lack medical "
-                "necessity. In encounter ENC-1003, CPT 45378 (Colonoscopy) was billed alongside acute pharyngitis without any "
-                "gastrointestinal indication. In encounter ENC-1015, CPT 71046 (Chest X-ray) was billed without any mention of imaging in the note."
+            "Unsupported Procedure Medical Necessity": (
+                "Identified when CPT procedural codes lack medical necessity justification based on the reported primary diagnosis. "
+                "In encounter ENC-1003, CPT 45378 (Colonoscopy) was billed alongside acute pharyngitis without any gastrointestinal indication."
+            ),
+            "Missing Procedure Documentation": (
+                "Occurs when an invasive or diagnostic procedure CPT code is billed but the encounter lacks standalone operative or "
+                "imaging findings documentation (e.g. ENC-1003 colonoscopy or ENC-1015 chest x-ray). Represents an unsubstantiated service requiring chart retrieval."
             ),
             "Unsupported E/M Level": (
                 "Triggered when high-complexity Level 5 outpatient E/M codes (CPT 99215) are billed for uncomplicated conditions "
@@ -515,6 +531,9 @@ class ComplianceReportGenerator:
             ),
             "Duplicate Diagnosis Entry": (
                 "Detected when identical ICD-10 codes are entered multiple times on the same encounter (e.g., ENC-1012). Causes clearinghouse claim rejections."
+            ),
+            "Duplicate Procedure Entry": (
+                "Detected when identical CPT codes are entered multiple times on the same encounter without required CPT modifiers."
             ),
             "Unverified Reference Code": (
                 "Triggered when a code outside the active reference standard is assigned (e.g., ENC-1017 Z99.999). Mandates manual tabular verification."

@@ -1,6 +1,6 @@
 """Audit rules engine for Medical Coding Compliance Audit Simulation.
 
-Implements modular, standalone validation functions to evaluate clinical records,
+Implements modular, clinically aware validation functions to evaluate clinical records,
 detect missing fields, identify duplicate codes, compare diagnoses with code mappings,
 flag unsupported or unverified codes, and check documentation deficiencies.
 
@@ -15,6 +15,46 @@ import pandas as pd
 
 from src.models import PatientRecord, AuditFinding, AuditSummary, AuditSeverity, IssueType
 from src.reference_data import ReferenceDataManager, get_reference_manager
+
+
+# Standard clinical negation phrases to prevent false positive keyword matching
+NEGATION_PATTERNS = [
+    r"\bno\s+history\s+of\b",
+    r"\bdenies\b",
+    r"\bnegative\s+for\b",
+    r"\bno\s+evidence\s+of\b",
+    r"\bruled\s+out\b",
+    r"\bwithout\s+history\s+of\b",
+    r"\bno\s+signs\s+of\b",
+    r"\bnot\s+indicated\b"
+]
+
+
+def is_negated_in_text(keyword: str, text: str) -> bool:
+    """Check if a clinical keyword is preceded by a common medical negation phrase.
+
+    Args:
+        keyword: Clinical symptom or disease term.
+        text: Clinical note text.
+
+    Returns:
+        True if the term appears only in a negative/ruled-out context.
+    """
+    text_lower = text.lower()
+    kw_lower = keyword.lower()
+
+    if kw_lower not in text_lower:
+        return False
+
+    # Check each occurrence of keyword for preceding negation within a 40-character window
+    for match in re.finditer(re.escape(kw_lower), text_lower):
+        start_idx = match.start()
+        window_start = max(0, start_idx - 40)
+        preceding_snippet = text_lower[window_start:start_idx]
+        for pattern in NEGATION_PATTERNS:
+            if re.search(pattern, preceding_snippet):
+                return True
+    return False
 
 
 # -----------------------------------------------------------------------------
@@ -42,15 +82,17 @@ def check_missing_fields(record: PatientRecord, ref: ReferenceDataManager) -> Li
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=record.assigned_icd10 or record.assigned_cpt or "(None)",
+                code_set_year="FY 2024 / 2024",
                 audit_issue=IssueType.MISSING_CLINICAL_DOCUMENTATION.value,
                 severity=AuditSeverity.HIGH,
                 reason=(
-                    f"Encounter [{record.encounter_id}] has no clinical documentation in chart notes. "
-                    f"Services and codes cannot be billed without supporting medical documentation."
+                    f"Encounter [{record.encounter_id}] lacks clinical progress notes in chart documentation. "
+                    f"Under Medicare integrity rules, services cannot be billed without supporting medical documentation. "
+                    f"Note: Missing documentation requires chart retrieval/reconciliation, not assumption of intentional miscoding."
                 ),
                 recommended_action=(
-                    "Locate and append clinical progress note for this encounter, or withdraw the claim "
-                    "from billing clearinghouse to prevent False Claims Act exposure."
+                    "Locate and append clinical progress note for this encounter, or place claim on hold "
+                    "pending provider verification to prevent billing compliance risk."
                 ),
                 reference_guideline=ref.get_citation("incomplete_clinical_notes"),
                 manual_review_required=True
@@ -67,11 +109,12 @@ def check_missing_fields(record: PatientRecord, ref: ReferenceDataManager) -> Li
                 patient_id=record.patient_id,
                 original_diagnosis="",
                 assigned_code=", ".join(assigned_icds),
+                code_set_year="FY 2024",
                 audit_issue=IssueType.MISSING_DIAGNOSIS.value,
                 severity=AuditSeverity.HIGH,
                 reason=(
                     f"Encounter bills diagnosis code(s) [{', '.join(assigned_icds)}] "
-                    f"but the documented diagnosis field is completely blank."
+                    f"but the documented diagnosis field is unpopulated. Diagnosis codes must reflect documented provider assessments."
                 ),
                 recommended_action=(
                     "Verify patient chart documentation. A certified coder must query "
@@ -90,6 +133,7 @@ def check_missing_fields(record: PatientRecord, ref: ReferenceDataManager) -> Li
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code="(Administrative)",
+                code_set_year="N/A",
                 audit_issue=IssueType.MISSING_REQUIRED_FIELD.value,
                 severity=AuditSeverity.MEDIUM,
                 reason="Encounter date of service is missing or unpopulated.",
@@ -131,6 +175,7 @@ def identify_duplicate_codes(record: PatientRecord, ref: ReferenceDataManager) -
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=dup,
+                code_set_year="FY 2024",
                 audit_issue=IssueType.DUPLICATE_DIAGNOSIS.value,
                 severity=AuditSeverity.MEDIUM,
                 reason=(
@@ -163,10 +208,11 @@ def identify_duplicate_codes(record: PatientRecord, ref: ReferenceDataManager) -
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=f"CPT {dup}",
+                code_set_year="2024",
                 audit_issue=IssueType.DUPLICATE_PROCEDURE.value,
                 severity=AuditSeverity.MEDIUM,
                 reason=(
-                    f"CPT procedure code [{dup}] is billed multiple times on the same encounter date without modifier."
+                    f"CPT procedure code [{dup}] is billed multiple times on the same encounter date without distinct modifier."
                 ),
                 recommended_action=(
                     f"Review whether CPT [{dup}] was performed multiple times. If so, append appropriate CPT modifier "
@@ -204,6 +250,7 @@ def flag_unsupported_or_unverified_codes(record: PatientRecord, ref: ReferenceDa
                     patient_id=record.patient_id,
                     original_diagnosis=record.documented_diagnosis,
                     assigned_code=code,
+                    code_set_year="Unverified Code Set",
                     audit_issue=IssueType.UNVERIFIED_CODE.value,
                     severity=AuditSeverity.MEDIUM,
                     reason=(
@@ -213,7 +260,7 @@ def flag_unsupported_or_unverified_codes(record: PatientRecord, ref: ReferenceDa
                     ),
                     recommended_action=(
                         f"Manually verify [{code}] in the current fiscal year ICD-10-CM coding manual. "
-                        f"Confirm validity, header chapter, and required 4th/5th/6th/7th character characters."
+                        f"Confirm code validity, header chapter, and required 4th/5th/6th/7th characters."
                     ),
                     reference_guideline=ref.get_citation("code_diagnosis_mismatch"),
                     manual_review_required=True
@@ -230,6 +277,7 @@ def flag_unsupported_or_unverified_codes(record: PatientRecord, ref: ReferenceDa
                     patient_id=record.patient_id,
                     original_diagnosis=record.documented_diagnosis,
                     assigned_code=f"CPT {cpt}",
+                    code_set_year="Unverified Code Set",
                     audit_issue=IssueType.UNVERIFIED_CODE.value,
                     severity=AuditSeverity.MEDIUM,
                     reason=(
@@ -252,6 +300,8 @@ def flag_unsupported_or_unverified_codes(record: PatientRecord, ref: ReferenceDa
 def compare_diagnoses_with_mappings(record: PatientRecord, ref: ReferenceDataManager) -> List[AuditFinding]:
     """Detect inconsistencies or contradictions between documented diagnoses and assigned codes.
 
+    Uses category cross-validation and clinical negation awareness rather than simple substring matching.
+
     Args:
         record: PatientRecord to evaluate.
         ref: ReferenceDataManager providing keyword definitions.
@@ -273,21 +323,32 @@ def compare_diagnoses_with_mappings(record: PatientRecord, ref: ReferenceDataMan
         code_desc = code_entry.get("description", "")
         code_year = code_entry.get("code_set_year", "FY 2024")
 
-        # Check if any keyword appears in documented diagnosis or clinical notes
-        has_keyword_match = any(kw.lower() in doc_diag_lower or kw.lower() in notes_lower for kw in keywords)
+        # 1. Check positive keyword matches (ignoring negated mentions in notes)
+        has_positive_match = False
+        for kw in keywords:
+            kw_l = kw.lower()
+            if kw_l in doc_diag_lower:
+                has_positive_match = True
+                break
+            if kw_l in notes_lower:
+                # Confirm it is not negated in the note text
+                if not is_negated_in_text(kw_l, notes_lower):
+                    has_positive_match = True
+                    break
 
-        if not has_keyword_match and doc_diag_lower:
+        if not has_positive_match and doc_diag_lower:
             findings.append(
                 AuditFinding(
                     encounter_id=record.encounter_id,
                     patient_id=record.patient_id,
                     original_diagnosis=record.documented_diagnosis,
-                    assigned_code=f"{code} ({code_desc}) [{code_year}]",
+                    assigned_code=f"{code} ({code_desc})",
+                    code_set_year=code_year,
                     audit_issue=IssueType.CODE_MISMATCH.value,
                     severity=AuditSeverity.HIGH,
                     reason=(
                         f"Documented condition '{record.documented_diagnosis}' conflicts with assigned code "
-                        f"[{code}: {code_desc}]. Clinical documentation does not mention or substantiate this diagnosis."
+                        f"[{code}: {code_desc}]. Clinical documentation does not positively substantiate this condition."
                     ),
                     recommended_action=(
                         f"Re-examine provider documentation. Align assigned ICD-10-CM code to match documented "
@@ -325,11 +386,13 @@ def identify_documentation_deficiencies(record: PatientRecord, ref: ReferenceDat
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=record.assigned_cpt or "(No CPT)",
+                code_set_year="2024",
                 audit_issue=IssueType.INCOMPLETE_DOCUMENTATION.value,
                 severity=AuditSeverity.HIGH if word_count < 5 else AuditSeverity.MEDIUM,
                 reason=(
                     f"Clinical documentation contains only {word_count} word(s) (minimum threshold: {min_words} words). "
-                    f"Documentation fails to substantiate encounter complexity, physical exam, or clinical management."
+                    f"Documentation fails to substantiate encounter complexity, physical exam, or clinical management. "
+                    f"Note: This documentation deficiency requires clinician addendum, not automatic assumption of fraud."
                 ),
                 recommended_action=(
                     "Request clinician addendum detailing Chief Complaint, History of Present Illness (HPI), "
@@ -352,6 +415,7 @@ def identify_documentation_deficiencies(record: PatientRecord, ref: ReferenceDat
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=record.assigned_cpt or "(E/M Encounter)",
+                code_set_year="2024",
                 audit_issue=IssueType.MISSING_PROVIDER_SIGNATURE.value,
                 severity=AuditSeverity.MEDIUM,
                 reason=(
@@ -372,12 +436,14 @@ def identify_documentation_deficiencies(record: PatientRecord, ref: ReferenceDat
 def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManager) -> List[AuditFinding]:
     """Verify that assigned CPT codes have medical necessity and procedure documentation.
 
+    Distinguishes missing procedure operative reports from lack of medical necessity.
+
     Args:
         record: PatientRecord to evaluate.
         ref: ReferenceDataManager providing CPT metadata and citations.
 
     Returns:
-        List of AuditFinding objects for unsupported procedures.
+        List of AuditFinding objects for procedure discrepancies.
     """
     findings: List[AuditFinding] = []
     cpt_codes = record.split_cpt_codes()
@@ -392,7 +458,7 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
         keywords = cpt_entry.get("keywords", [])
         compatible_diags = cpt_entry.get("compatible_diagnoses", [])
 
-        # Check if procedure documentation is present in notes when required
+        # 1. Check if procedure documentation is present in notes when required
         if requires_proc_note:
             has_proc_mention = any(kw.lower() in notes_lower for kw in keywords)
             if not has_proc_mention:
@@ -402,22 +468,24 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
                         patient_id=record.patient_id,
                         original_diagnosis=record.documented_diagnosis,
                         assigned_code=f"CPT {cpt} ({cpt_entry.get('description', '')})",
-                        audit_issue=IssueType.UNSUPPORTED_PROCEDURE.value,
+                        code_set_year="2024",
+                        audit_issue=IssueType.MISSING_PROCEDURE_DOCUMENTATION.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
                             f"CPT code [{cpt}] requires formal procedure documentation/report, but clinical note "
-                            f"contains no documentation of the procedure being performed or findings interpreted."
+                            f"contains no documentation of the procedure being performed or findings interpreted. "
+                            f"Requires operative report retrieval; not definitive proof of improper coding."
                         ),
                         recommended_action=(
-                            f"Remove CPT [{cpt}] from claim or locate and append the standalone operative/procedure report "
-                            f"signed by the performing clinician."
+                            f"Locate and append standalone procedure report signed by performing clinician, "
+                            f"or remove CPT [{cpt}] prior to claim submission."
                         ),
                         reference_guideline=ref.get_citation("missing_procedure_documentation"),
                         manual_review_required=True
                     )
                 )
 
-        # Check medical necessity compatibility
+        # 2. Check medical necessity compatibility
         if compatible_diags:
             assigned_icds = record.split_icd10_codes()
             has_compatible_icd = any(icd in compatible_diags for icd in assigned_icds)
@@ -428,6 +496,7 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
                         patient_id=record.patient_id,
                         original_diagnosis=record.documented_diagnosis,
                         assigned_code=f"CPT {cpt}",
+                        code_set_year="2024",
                         audit_issue=IssueType.UNSUPPORTED_PROCEDURE.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
@@ -484,6 +553,7 @@ def check_unsupported_em_levels(record: PatientRecord, ref: ReferenceDataManager
                         patient_id=record.patient_id,
                         original_diagnosis=record.documented_diagnosis,
                         assigned_code=f"CPT {cpt} (Level 5 E/M)",
+                        code_set_year="2024",
                         audit_issue=IssueType.UNSUPPORTED_EM_LEVEL.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
@@ -533,6 +603,7 @@ def check_unspecified_code_usage(record: PatientRecord, ref: ReferenceDataManage
                     patient_id=record.patient_id,
                     original_diagnosis=record.documented_diagnosis,
                     assigned_code=code,
+                    code_set_year="FY 2024",
                     audit_issue=IssueType.UNSPECIFIED_CODE_USAGE.value,
                     severity=AuditSeverity.LOW,
                     reason=(
@@ -562,41 +633,53 @@ class AuditEngine:
         self.ref = ref_manager or get_reference_manager()
 
     def audit_record(self, record: PatientRecord) -> List[AuditFinding]:
-        """Run all compliance checks on a single patient record using modular functions.
+        """Run all compliance checks on a single patient record with duplicate suppression.
 
         Args:
             record: PatientRecord to evaluate.
 
         Returns:
-            List of identified AuditFinding instances.
+            List of distinct, deduplicated AuditFinding instances.
         """
-        findings: List[AuditFinding] = []
+        raw_findings: List[AuditFinding] = []
 
         # 1. Missing fields & missing documentation
-        findings.extend(check_missing_fields(record, self.ref))
+        raw_findings.extend(check_missing_fields(record, self.ref))
 
         # 2. Duplicate codes (ICD-10 & CPT)
-        findings.extend(identify_duplicate_codes(record, self.ref))
+        raw_findings.extend(identify_duplicate_codes(record, self.ref))
 
         # 3. Unverified reference codes (codes outside reference dictionary)
-        findings.extend(flag_unsupported_or_unverified_codes(record, self.ref))
+        raw_findings.extend(flag_unsupported_or_unverified_codes(record, self.ref))
 
-        # 4. Code vs documented diagnosis mismatches
-        findings.extend(compare_diagnoses_with_mappings(record, self.ref))
+        # 4. Code vs documented diagnosis mismatches (with negation awareness)
+        raw_findings.extend(compare_diagnoses_with_mappings(record, self.ref))
 
         # 5. Unspecified code usage when specificity is documented
-        findings.extend(check_unspecified_code_usage(record, self.ref))
+        raw_findings.extend(check_unspecified_code_usage(record, self.ref))
 
         # 6. Incomplete clinical documentation & missing signatures
-        findings.extend(identify_documentation_deficiencies(record, self.ref))
+        raw_findings.extend(identify_documentation_deficiencies(record, self.ref))
 
-        # 7. Unsupported procedures and medical necessity
-        findings.extend(check_unsupported_procedures(record, self.ref))
+        # 7. Unsupported procedures and medical necessity (distinct issues)
+        raw_findings.extend(check_unsupported_procedures(record, self.ref))
 
         # 8. Unsupported high-level E/M coding
-        findings.extend(check_unsupported_em_levels(record, self.ref))
+        raw_findings.extend(check_unsupported_em_levels(record, self.ref))
 
-        return findings
+        # Strict duplicate finding prevention:
+        # Prevent emitting identical findings for the same encounter, code, and issue type
+        deduped_findings: List[AuditFinding] = []
+        seen_keys = set()
+        for f in raw_findings:
+            # Key uniquely identifies encounter, base code (without long desc), and issue category
+            base_code = f.assigned_code.split(" (")[0].strip()
+            dedup_key = (f.encounter_id, base_code, f.audit_issue)
+            if dedup_key not in seen_keys:
+                seen_keys.add(dedup_key)
+                deduped_findings.append(f)
+
+        return deduped_findings
 
     def audit_dataset(self, records: List[PatientRecord]) -> AuditSummary:
         """Audit an entire collection of patient records and build summary statistics.
@@ -622,7 +705,8 @@ class AuditEngine:
                         IssueType.INCOMPLETE_DOCUMENTATION.value,
                         IssueType.MISSING_PROVIDER_SIGNATURE.value,
                         IssueType.MISSING_CLINICAL_DOCUMENTATION.value,
-                        IssueType.MISSING_REQUIRED_FIELD.value
+                        IssueType.MISSING_REQUIRED_FIELD.value,
+                        IssueType.MISSING_PROCEDURE_DOCUMENTATION.value
                     ]:
                         doc_issues += 1
                     else:
