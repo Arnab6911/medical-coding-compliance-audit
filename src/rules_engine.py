@@ -10,21 +10,29 @@ this engine strictly enforces that patient records and codes are never modified 
 
 from __future__ import annotations
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
 import pandas as pd
 
 from src.models import PatientRecord, AuditFinding, AuditSummary, AuditSeverity, IssueType
 from src.reference_data import ReferenceDataManager, get_reference_manager
 
 
+# Clinical stopwords ignored during diagnostic core concept token comparison
+CLINICAL_STOPWORDS: Set[str] = {
+    "with", "without", "unspecified", "other", "initial", "subsequent",
+    "encounter", "due", "to", "of", "in", "and", "or", "for", "primary",
+    "secondary", "type", "site", "not", "specified"
+}
+
 # Standard clinical negation phrases to prevent false positive keyword matching
 NEGATION_PATTERNS = [
-    r"\bno\s+history\s+of\b",
+    r"\bno\b",
     r"\bdenies\b",
+    r"\bwithout\b",
     r"\bnegative\s+for\b",
-    r"\bno\s+evidence\s+of\b",
+    r"\bno\s+history\s+of\b",
     r"\bruled\s+out\b",
-    r"\bwithout\s+history\s+of\b",
+    r"\bno\s+evidence\s+of\b",
     r"\bno\s+signs\s+of\b",
     r"\bnot\s+indicated\b"
 ]
@@ -46,14 +54,75 @@ def is_negated_in_text(keyword: str, text: str) -> bool:
     if kw_lower not in text_lower:
         return False
 
-    # Check each occurrence of keyword for preceding negation within a 40-character window
+    # Check each occurrence of keyword for preceding negation within a 35-character window
     for match in re.finditer(re.escape(kw_lower), text_lower):
         start_idx = match.start()
-        window_start = max(0, start_idx - 40)
+        window_start = max(0, start_idx - 35)
         preceding_snippet = text_lower[window_start:start_idx]
         for pattern in NEGATION_PATTERNS:
             if re.search(pattern, preceding_snippet):
                 return True
+    return False
+
+
+def is_diagnosis_supported(
+    code_entry: Optional[Dict[str, Any]],
+    documented_diagnosis: str,
+    clinical_documentation: str
+) -> bool:
+    """Evaluate whether an assigned ICD-10 code is clinically substantiated by documentation.
+
+    Prevents false-positive mismatches by combining:
+    1. Direct phrase alignment with official code descriptions.
+    2. Core clinical concept token overlap.
+    3. Keyword synonyms evaluated with clinical negation awareness.
+
+    Args:
+        code_entry: Dictionary containing code metadata, description, and keywords.
+        documented_diagnosis: Diagnosis as recorded in clinical chart.
+        clinical_documentation: Free-text progress note from encounter.
+
+    Returns:
+        True if the diagnosis is substantiated; False if an actual clinical mismatch exists.
+    """
+    if not code_entry:
+        return True
+
+    doc_lower = (documented_diagnosis or "").lower().strip()
+    notes_lower = (clinical_documentation or "").lower().strip()
+    desc_lower = code_entry.get("description", "").lower().strip()
+
+    if not doc_lower:
+        return False
+
+    # 1. Direct equality or substring containment
+    if doc_lower == desc_lower or desc_lower in doc_lower or doc_lower in desc_lower:
+        return True
+
+    # 2. Tokenized core clinical concept overlap
+    doc_words = set(re.sub(r"[^\w\s]", " ", doc_lower).split()) - CLINICAL_STOPWORDS
+    desc_words = set(re.sub(r"[^\w\s]", " ", desc_lower).split()) - CLINICAL_STOPWORDS
+
+    # If core descriptive words of the code are a subset of documented diagnosis
+    if desc_words and desc_words.issubset(doc_words):
+        return True
+
+    # If substantial overlap exists (>= 50% of significant code description words)
+    overlap = desc_words.intersection(doc_words)
+    if desc_words and len(overlap) / len(desc_words) >= 0.5:
+        return True
+
+    # 3. Check curated clinical keywords against documented diagnosis and notes
+    keywords = code_entry.get("keywords", [])
+    for kw in keywords:
+        kw_l = kw.lower()
+        # Direct keyword appearance in documented diagnosis
+        if kw_l in doc_lower:
+            return True
+        # Keyword appearance in notes, provided it is NOT in a negated context
+        if kw_l in notes_lower and not is_negated_in_text(kw_l, notes_lower):
+            return True
+
     return False
 
 
@@ -82,7 +151,7 @@ def check_missing_fields(record: PatientRecord, ref: ReferenceDataManager) -> Li
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=record.assigned_icd10 or record.assigned_cpt or "(None)",
-                code_set_year="FY 2024 / 2024",
+                code_set_year="FY 2024 / 2024 (Historical)",
                 audit_issue=IssueType.MISSING_CLINICAL_DOCUMENTATION.value,
                 severity=AuditSeverity.HIGH,
                 reason=(
@@ -109,7 +178,7 @@ def check_missing_fields(record: PatientRecord, ref: ReferenceDataManager) -> Li
                 patient_id=record.patient_id,
                 original_diagnosis="",
                 assigned_code=", ".join(assigned_icds),
-                code_set_year="FY 2024",
+                code_set_year="FY 2024 (Historical)",
                 audit_issue=IssueType.MISSING_DIAGNOSIS.value,
                 severity=AuditSeverity.HIGH,
                 reason=(
@@ -138,7 +207,7 @@ def check_missing_fields(record: PatientRecord, ref: ReferenceDataManager) -> Li
                 severity=AuditSeverity.MEDIUM,
                 reason="Encounter date of service is missing or unpopulated.",
                 recommended_action="Populate verified date of service from EHR master encounter schedule.",
-                reference_guideline="CMS Claims Processing Manual (Pub. 100-04) Chapter 1 §80: Date of service is mandatory for valid claim adjudication.",
+                reference_guideline="CMS Claims Processing Manual (Pub. 100-04) Chapter 1 §80: Basic claim line elements including date of service are mandatory for valid claim adjudication.",
                 manual_review_required=True
             )
         )
@@ -175,7 +244,7 @@ def identify_duplicate_codes(record: PatientRecord, ref: ReferenceDataManager) -
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=dup,
-                code_set_year="FY 2024",
+                code_set_year="FY 2024 (Historical)",
                 audit_issue=IssueType.DUPLICATE_DIAGNOSIS.value,
                 severity=AuditSeverity.MEDIUM,
                 reason=(
@@ -208,7 +277,7 @@ def identify_duplicate_codes(record: PatientRecord, ref: ReferenceDataManager) -
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=f"CPT {dup}",
-                code_set_year="2024",
+                code_set_year="2024 (Historical)",
                 audit_issue=IssueType.DUPLICATE_PROCEDURE.value,
                 severity=AuditSeverity.MEDIUM,
                 reason=(
@@ -218,7 +287,7 @@ def identify_duplicate_codes(record: PatientRecord, ref: ReferenceDataManager) -
                     f"Review whether CPT [{dup}] was performed multiple times. If so, append appropriate CPT modifier "
                     f"(e.g., modifier 76/59) or remove duplicate line."
                 ),
-                reference_guideline="CMS National Correct Coding Initiative (NCCI) Policy Manual Chapter 1 §B: Multiple procedure duplication guidelines.",
+                reference_guideline="CMS National Correct Coding Initiative (NCCI) Policy Manual Chapter 1 §B: Multiple procedure duplication guidelines; repeatable services require distinct modifiers.",
                 manual_review_required=True
             )
         )
@@ -259,10 +328,10 @@ def flag_unsupported_or_unverified_codes(record: PatientRecord, ref: ReferenceDa
                         f"Explicit manual verification against official CMS Tabular Index required."
                     ),
                     recommended_action=(
-                        f"Manually verify [{code}] in the current fiscal year ICD-10-CM coding manual. "
+                        f"Manually verify [{code}] in the official ICD-10-CM coding manual. "
                         f"Confirm code validity, header chapter, and required 4th/5th/6th/7th characters."
                     ),
-                    reference_guideline=ref.get_citation("code_diagnosis_mismatch"),
+                    reference_guideline=ref.get_citation("unverified_code_manual_check"),
                     manual_review_required=True
                 )
             )
@@ -300,43 +369,35 @@ def flag_unsupported_or_unverified_codes(record: PatientRecord, ref: ReferenceDa
 def compare_diagnoses_with_mappings(record: PatientRecord, ref: ReferenceDataManager) -> List[AuditFinding]:
     """Detect inconsistencies or contradictions between documented diagnoses and assigned codes.
 
-    Uses category cross-validation and clinical negation awareness rather than simple substring matching.
+    Uses category cross-validation, token overlap, and clinical negation awareness
+    rather than simplistic substring matching, preventing false positive mismatches.
 
     Args:
         record: PatientRecord to evaluate.
         ref: ReferenceDataManager providing keyword definitions.
 
     Returns:
-        List of AuditFinding objects for code/diagnosis mismatches.
+        List of AuditFinding objects for genuine code/diagnosis mismatches.
     """
     findings: List[AuditFinding] = []
     codes = record.split_icd10_codes()
-    doc_diag_lower = (record.documented_diagnosis or "").lower()
-    notes_lower = (record.clinical_documentation or "").lower()
 
     for code in codes:
         code_entry = ref.get_icd10_entry(code)
         if not code_entry:
             continue
 
-        keywords = code_entry.get("keywords", [])
         code_desc = code_entry.get("description", "")
-        code_year = code_entry.get("code_set_year", "FY 2024")
+        code_year = "FY 2024 (Historical)"
 
-        # 1. Check positive keyword matches (ignoring negated mentions in notes)
-        has_positive_match = False
-        for kw in keywords:
-            kw_l = kw.lower()
-            if kw_l in doc_diag_lower:
-                has_positive_match = True
-                break
-            if kw_l in notes_lower:
-                # Confirm it is not negated in the note text
-                if not is_negated_in_text(kw_l, notes_lower):
-                    has_positive_match = True
-                    break
+        # Clinically evaluate whether code is supported
+        supported = is_diagnosis_supported(
+            code_entry,
+            record.documented_diagnosis,
+            record.clinical_documentation
+        )
 
-        if not has_positive_match and doc_diag_lower:
+        if not supported and (record.documented_diagnosis or "").strip():
             findings.append(
                 AuditFinding(
                     encounter_id=record.encounter_id,
@@ -348,7 +409,7 @@ def compare_diagnoses_with_mappings(record: PatientRecord, ref: ReferenceDataMan
                     severity=AuditSeverity.HIGH,
                     reason=(
                         f"Documented condition '{record.documented_diagnosis}' conflicts with assigned code "
-                        f"[{code}: {code_desc}]. Clinical documentation does not positively substantiate this condition."
+                        f"[{code}: {code_desc}]. Clinical documentation does not positively substantiate this diagnosis."
                     ),
                     recommended_action=(
                         f"Re-examine provider documentation. Align assigned ICD-10-CM code to match documented "
@@ -386,7 +447,7 @@ def identify_documentation_deficiencies(record: PatientRecord, ref: ReferenceDat
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=record.assigned_cpt or "(No CPT)",
-                code_set_year="2024",
+                code_set_year="2024 (Historical)",
                 audit_issue=IssueType.INCOMPLETE_DOCUMENTATION.value,
                 severity=AuditSeverity.HIGH if word_count < 5 else AuditSeverity.MEDIUM,
                 reason=(
@@ -415,7 +476,7 @@ def identify_documentation_deficiencies(record: PatientRecord, ref: ReferenceDat
                 patient_id=record.patient_id,
                 original_diagnosis=record.documented_diagnosis,
                 assigned_code=record.assigned_cpt or "(E/M Encounter)",
-                code_set_year="2024",
+                code_set_year="2024 (Historical)",
                 audit_issue=IssueType.MISSING_PROVIDER_SIGNATURE.value,
                 severity=AuditSeverity.MEDIUM,
                 reason=(
@@ -468,7 +529,7 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
                         patient_id=record.patient_id,
                         original_diagnosis=record.documented_diagnosis,
                         assigned_code=f"CPT {cpt} ({cpt_entry.get('description', '')})",
-                        code_set_year="2024",
+                        code_set_year="2024 (Historical)",
                         audit_issue=IssueType.MISSING_PROCEDURE_DOCUMENTATION.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
@@ -496,7 +557,7 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
                         patient_id=record.patient_id,
                         original_diagnosis=record.documented_diagnosis,
                         assigned_code=f"CPT {cpt}",
-                        code_set_year="2024",
+                        code_set_year="2024 (Historical)",
                         audit_issue=IssueType.UNSUPPORTED_PROCEDURE.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
@@ -553,13 +614,13 @@ def check_unsupported_em_levels(record: PatientRecord, ref: ReferenceDataManager
                         patient_id=record.patient_id,
                         original_diagnosis=record.documented_diagnosis,
                         assigned_code=f"CPT {cpt} (Level 5 E/M)",
-                        code_set_year="2024",
+                        code_set_year="2024 (Historical)",
                         audit_issue=IssueType.UNSUPPORTED_EM_LEVEL.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
                             f"Level 5 E/M code [{cpt}] assigned for diagnosis '{record.documented_diagnosis}'. "
                             f"Documentation lacks evidence of high Medical Decision Making (MDM) complexity "
-                            f"or qualifying total encounter time (requires 40-54 min for 99215)."
+                            f"or qualifying total encounter time (requires 40-54 min for 99215 under 2021/2023 E/M rules)."
                         ),
                         recommended_action=(
                             "Downcode to appropriate E/M level supported by documentation (e.g. 99213/99214) "
@@ -603,7 +664,7 @@ def check_unspecified_code_usage(record: PatientRecord, ref: ReferenceDataManage
                     patient_id=record.patient_id,
                     original_diagnosis=record.documented_diagnosis,
                     assigned_code=code,
-                    code_set_year="FY 2024",
+                    code_set_year="FY 2024 (Historical)",
                     audit_issue=IssueType.UNSPECIFIED_CODE_USAGE.value,
                     severity=AuditSeverity.LOW,
                     reason=(

@@ -11,6 +11,7 @@ Validates:
 8. Duplicate finding prevention (preventing identical findings for the same code).
 9. Statistical consistency across audit engine, CSV export, and Word report.
 10. Clinical negation awareness (preventing false-positive keyword matching).
+11. Verification that matching diagnoses (ENC-1007, ENC-1006) do not generate false-positive mismatches.
 """
 
 import io
@@ -30,7 +31,8 @@ from src.rules_engine import (
     check_unsupported_procedures,
     check_unsupported_em_levels,
     check_unspecified_code_usage,
-    is_negated_in_text
+    is_negated_in_text,
+    is_diagnosis_supported
 )
 from src.reference_data import get_reference_manager
 from src.report_generator import ComplianceReportGenerator
@@ -283,7 +285,7 @@ def test_clean_record_passes_without_findings(engine):
 
 
 def test_diagnosis_code_mismatch(engine):
-    """Verify diagnosis conflicts with assigned code (e.g. Hypertension vs Diabetes)."""
+    """Verify genuine diagnosis conflict with assigned code (e.g. Hypertension vs Diabetes)."""
     rec = PatientRecord(
         encounter_id="ENC-TEST-MISMATCH",
         patient_id="PT-TEST-MISMATCH",
@@ -301,7 +303,7 @@ def test_diagnosis_code_mismatch(engine):
     mismatches = [f for f in findings if f.audit_issue == IssueType.CODE_MISMATCH.value]
     assert len(mismatches) == 1
     assert mismatches[0].severity == AuditSeverity.HIGH
-    assert mismatches[0].code_set_year == "FY 2024"
+    assert "FY 2024 (Historical)" in mismatches[0].code_set_year
 
 
 def test_unsupported_procedure_and_medical_necessity(engine):
@@ -405,13 +407,11 @@ def test_duplicate_finding_prevention(engine):
     enc_1003 = next(r for r in records if r.encounter_id == "ENC-1003")
     findings = engine.audit_record(enc_1003)
 
-    # Check for distinct issue categories
     issue_types = [f.audit_issue for f in findings]
     assert len(issue_types) == len(set(issue_types)), "All findings on ENC-1003 must be distinct issue categories"
     assert IssueType.MISSING_PROCEDURE_DOCUMENTATION.value in issue_types
     assert IssueType.UNSUPPORTED_PROCEDURE.value in issue_types
 
-    # Ensure no exact duplicate tuple exists across any encounter in the sample dataset
     summary = engine.audit_dataset(records)
     seen_tuples = set()
     for f in summary.findings:
@@ -430,14 +430,12 @@ def test_consistency_report_statistics_and_audit_results(engine):
     records = load_records_from_csv("data/sample_records.csv")
     summary = engine.audit_dataset(records)
 
-    # 1. Verify summary internal mathematical consistency
     assert summary.total_records == summary.records_flagged + summary.clean_records
     assert summary.total_findings == len(summary.findings)
     assert summary.total_findings == (
         summary.high_severity_count + summary.medium_severity_count + summary.low_severity_count
     )
 
-    # 2. Verify CSV findings match summary
     df = pd.DataFrame([f.to_dict() for f in summary.findings])
     assert len(df) == summary.total_findings
     assert (df["Severity"] == "High").sum() == summary.high_severity_count
@@ -445,7 +443,6 @@ def test_consistency_report_statistics_and_audit_results(engine):
     assert (df["Severity"] == "Low").sum() == summary.low_severity_count
     assert (df["Manual Review Required"] == "Yes").all(), "All findings must require human review"
 
-    # 3. Verify Word Report findings table rows match summary
     generator = ComplianceReportGenerator(summary, records=records)
     stream = generator.generate()
     doc = docx.Document(stream)
@@ -468,7 +465,6 @@ def test_consistency_report_statistics_and_audit_results(engine):
 
 def test_clinical_negation_awareness(engine):
     """Verify that diagnoses mentioned only in a negative context are not falsely matched."""
-    # Note states 'No history of diabetes mellitus' while documenting 'Essential hypertension'
     rec_negated = PatientRecord(
         encounter_id="ENC-TEST-NEGATION",
         patient_id="PT-TEST-NEG",
@@ -477,7 +473,7 @@ def test_clinical_negation_awareness(engine):
         encounter_date="2024-03-01",
         clinical_documentation="Patient presents for blood pressure evaluation. BP 130/80 mmHg. No history of diabetes mellitus. Compliant with lisinopril. Electronically signed by Dr. Mark Davis, MD.",
         documented_diagnosis="Essential hypertension",
-        assigned_icd10="E11.9", # Diabetes code assigned!
+        assigned_icd10="E11.9",
         procedure_description="Office visit",
         assigned_cpt="99213",
         documentation_completeness="Complete"
@@ -487,3 +483,43 @@ def test_clinical_negation_awareness(engine):
     assert len(mismatches) == 1, (
         "Negated mention 'No history of diabetes' must not be treated as a positive match for diabetes code E11.9"
     )
+
+
+# -----------------------------------------------------------------------------
+# 11. FALSE-POSITIVE PREVENTION PROOF TESTS (ENC-1007 AND ENC-1006)
+# -----------------------------------------------------------------------------
+
+def test_enc1007_no_false_positive_mismatch(engine):
+    """Prove that ENC-1007 does NOT generate a false-positive Diagnosis Code Mismatch finding.
+
+    Documented: 'Type 2 diabetes mellitus with hyperglycemia'
+    Assigned Code: E11.65 ('Type 2 diabetes mellitus with hyperglycemia')
+    This is an exact diagnostic match and must produce zero mismatch findings.
+    """
+    records = load_records_from_csv("data/sample_records.csv")
+    enc_1007 = next(r for r in records if r.encounter_id == "ENC-1007")
+
+    findings = engine.audit_record(enc_1007)
+    mismatches = [f for f in findings if f.audit_issue == IssueType.CODE_MISMATCH.value]
+    assert len(mismatches) == 0, "ENC-1007 must not generate a Diagnosis Code Mismatch finding"
+    assert len(findings) == 0, "ENC-1007 is a compliant, well-documented encounter and must have 0 findings"
+
+
+def test_enc1006_no_false_positive_mismatch(engine):
+    """Prove that ENC-1006 does NOT generate a false-positive Diagnosis Code Mismatch finding.
+
+    Documented: 'Primary osteoarthritis of right knee'
+    Assigned Code: M17.9 ('Osteoarthritis of knee, unspecified')
+    The underlying clinical condition matches (knee osteoarthritis). It must ONLY produce an
+    Unspecified Code Warning (Low Severity), NOT a High-Severity Diagnosis Code Mismatch.
+    """
+    records = load_records_from_csv("data/sample_records.csv")
+    enc_1006 = next(r for r in records if r.encounter_id == "ENC-1006")
+
+    findings = engine.audit_record(enc_1006)
+    mismatches = [f for f in findings if f.audit_issue == IssueType.CODE_MISMATCH.value]
+    assert len(mismatches) == 0, "ENC-1006 must not generate a Diagnosis Code Mismatch finding"
+
+    unspecified_warnings = [f for f in findings if f.audit_issue == IssueType.UNSPECIFIED_CODE_USAGE.value]
+    assert len(unspecified_warnings) == 1, "ENC-1006 must generate exactly 1 Unspecified Code Warning"
+    assert unspecified_warnings[0].severity == AuditSeverity.LOW

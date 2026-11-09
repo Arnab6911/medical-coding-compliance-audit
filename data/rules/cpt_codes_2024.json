@@ -1,9 +1,9 @@
 {
-  "version": "CPT 2024 (Educational Reference Subset)",
-  "code_set_year": "2024",
+  "version": "CPT 2024 (Historical Educational Reference Subset)",
+  "code_set_year": "2024 (Historical)",
   "source": "American Medical Association (AMA) Educational Standard Reference",
   "last_updated": "2024-01-01",
-  "disclaimer": "CPT codes and descriptions are copyright American Medical Association. This educational subset is presented strictly for simulated compliance auditing training and contains no proprietary AMA value-add content.",
+  "disclaimer": "Historical Reference Notice: CPT codes and descriptions are copyright American Medical Association. This historical educational subset is presented strictly for simulated compliance auditing training and does not claim current annual coding compliance.",
   "codes": {
     "99211": {
       "description": "Office or other outpatient visit for evaluation and management of established patient, not requiring presence of physician or QHP",

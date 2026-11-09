@@ -57,15 +57,15 @@ class ReferenceDataManager:
 
     @property
     def icd10_version(self) -> str:
-        return self.icd10_data.get("version", "ICD-10-CM FY 2024 (Educational Subset)")
+        return self.icd10_data.get("version", "ICD-10-CM FY 2024 (Historical Educational Reference Subset)")
 
     @property
     def cpt_version(self) -> str:
-        return self.cpt_data.get("version", "CPT 2024 (Educational Subset)")
+        return self.cpt_data.get("version", "CPT 2024 (Historical Educational Reference Subset)")
 
     @property
     def rules_version(self) -> str:
-        return self.rules_config.get("rules_version", "2024.1")
+        return self.rules_config.get("rules_version", "2024.1 (Historical Reference Standard)")
 
     def get_icd10_entry(self, code: str) -> Optional[Dict[str, Any]]:
         """Lookup an ICD-10-CM code definition in reference dataset."""

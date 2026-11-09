@@ -1,9 +1,9 @@
 {
-  "version": "ICD-10-CM FY 2024 (Educational Reference Subset)",
-  "code_set_year": "FY 2024",
+  "version": "ICD-10-CM FY 2024 (Historical Educational Reference Subset)",
+  "code_set_year": "FY 2024 (Historical)",
   "source": "Centers for Medicare & Medicaid Services (CMS) / National Center for Health Statistics (NCHS)",
   "last_updated": "2024-10-01",
-  "disclaimer": "This code subset is provided strictly for educational compliance simulation and training purposes. Verified against official CMS FY 2024 ICD-10-CM guidelines.",
+  "disclaimer": "Historical Reference Notice: This code subset is provided strictly for educational compliance simulation and training purposes using historical FY 2024 standards. It does not represent current FY2026/FY2027 annual coding updates.",
   "codes": {
     "I10": {
       "description": "Essential (primary) hypertension",

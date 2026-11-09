@@ -122,11 +122,12 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # Mandatory Simulation Notice
+    # Mandatory Simulation & Historical Reference Notice
     st.markdown("""
     <div class="disclaimer-banner">
-        ⚠️ <strong>EDUCATIONAL SIMULATION NOTICE:</strong> This application analyzes synthetic, fictional medical records
-        for educational compliance demonstration. It does <strong>not</strong> provide certified medical coding advice, legal counsel,
+        ⚠️ <strong>EDUCATIONAL SIMULATION & HISTORICAL REFERENCE NOTICE:</strong> This application analyzes synthetic, fictional medical records
+        for educational compliance demonstration using historical reference standards (ICD-10-CM FY2024 and CPT 2024 Educational Reference Subsets).
+        It does <strong>not</strong> claim compliance with current FY2026/FY2027 code updates, nor provide certified medical coding advice, legal counsel,
         or HIPAA-certified security. Automated flags highlight potential discrepancies requiring <strong>certified human auditor review</strong>.
         In strict compliance with audit governance, this software <strong>never modifies patient records or billing codes</strong>.
     </div>
@@ -302,7 +303,7 @@ def main():
             st.dataframe(
                 df_findings[[
                     "Encounter ID", "Patient ID", "Severity", "Audit Issue",
-                    "Assigned Code", "Original Diagnosis", "Reason for Flagging",
+                    "Assigned Code", "Code-Set Year", "Original Diagnosis", "Reason for Flagging",
                     "Recommended Corrective Action", "Reference / Guideline"
                 ]],
                 use_container_width=True,
