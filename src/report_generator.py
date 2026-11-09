@@ -142,7 +142,7 @@ class ComplianceReportGenerator:
         p_space.paragraph_format.space_before = Pt(36)
 
         p_org = self.doc.add_paragraph()
-        r_org = p_org.add_run("HEALTHCARE COMPLIANCE & INTEGRITY AUDIT DIVISION")
+        r_org = p_org.add_run("MEDICAL CODING COMPLIANCE AUDIT – STUDENT PROJECT")
         r_org.font.size = Pt(11)
         r_org.font.bold = True
         r_org.font.color.rgb = SECONDARY_COLOR
@@ -227,12 +227,11 @@ class ComplianceReportGenerator:
             f"compliance with federal billing regulations, ICD-10-CM Official Coding Guidelines (FY 2024 Historical Reference), and "
             f"CPT 2024 documentation requirements. The audit engine identified {self.summary.total_findings} distinct "
             f"compliance findings across {self.summary.records_flagged} encounter(s), yielding an overall encounter "
-            f"compliance rate of {self.summary.compliance_rate}% and a manual review requirement rate of "
+            f"validation pass rate of {self.summary.compliance_rate}% and a manual review requirement rate of "
             f"{self.summary.review_rate}%.\n\n"
-            f"High-severity issues—representing recoupment exposure or False Claims Act scrutiny—account for "
+            f"High-severity issues—representing potential compliance risk requiring qualified manual review prior to billing—account for "
             f"{self.summary.high_severity_count} findings ({round(self.summary.high_severity_count / max(self.summary.total_findings, 1) * 100, 1)}% "
-            f"of total issues). A total of {self.summary.clean_records} encounter(s) demonstrated complete documentation, "
-            f"valid clinician signatures, and fully substantiated coding."
+            f"of total issues). A total of {self.summary.clean_records} encounter(s) represent encounters that passed the configured automated validation rules."
         )
 
         # Summary Metrics Table with clean column widths
@@ -254,8 +253,8 @@ class ComplianceReportGenerator:
         metrics = [
             ("Total Records Audited", f"{self.summary.total_records}", "100% of study cohort"),
             ("Records Requiring Review", f"{self.summary.records_flagged}", f"{self.summary.review_rate}% of records flagged"),
-            ("Compliant Encounters (Clean)", f"{self.summary.clean_records}", f"{self.summary.compliance_rate}% compliance rate"),
-            ("High-Severity Discrepancies", f"{self.summary.high_severity_count}", "Priority stop: overpayment / recoupment risk"),
+            ("Passed Automated Validation", f"{self.summary.clean_records}", f"{self.summary.compliance_rate}% automated pass rate"),
+            ("High-Severity Discrepancies", f"{self.summary.high_severity_count}", "Priority review: potential compliance risk"),
             ("Documentation vs Coding Issues", f"{self.summary.documentation_issues_count} Doc / {self.summary.coding_issues_count} Code", "Categorical issue balance")
         ]
 
@@ -288,10 +287,10 @@ class ComplianceReportGenerator:
             "Evaluation and Management (E/M) services. Healthcare providers bear the legal responsibility to ensure that "
             "every code submitted to Medicare, Medicaid, or commercial payers is strictly substantiated by authentic, legible, "
             "and clinically sufficient medical documentation.\n\n"
-            "The Department of Health and Human Services Office of Inspector General (HHS-OIG) consistently targets improper "
-            "coding practices under the False Claims Act (31 U.S.C. § 3729) and the Civil Monetary Penalties Law. Conducting "
+            "The Department of Health and Human Services Office of Inspector General (HHS-OIG) consistently evaluates billing "
+            "and coding compliance under applicable program integrity guidelines. Conducting "
             "regular pre-bill and retrospective coding compliance audits is an essential safeguard to maintain billing "
-            "integrity, optimize clinical documentation, and eliminate financial liability."
+            "integrity, optimize clinical documentation, and mitigate potential regulatory and compliance risks."
         )
         p.paragraph_format.space_after = Pt(12)
 
@@ -347,8 +346,9 @@ class ComplianceReportGenerator:
             "encryption and must not receive real Protected Health Information (PHI).\n"
             "3. Codebook Coverage: The reference database encompasses a curated educational reference subset. Codes outside this "
             "subset are flagged as 'Unverified Reference Code' for manual verification rather than assumed invalid.\n"
-            "4. Missing Documentation vs. Coding Fraud: Missing clinical documentation is flagged as an unverified service "
-            "requiring chart retrieval and provider query, rather than an automatic accusation of intentional coding fraud.\n"
+            "4. Potential Compliance Risks vs. Intentional Misconduct: Missing clinical documentation or coding discrepancies "
+            "are flagged as potential compliance risks requiring chart retrieval, provider query, and qualified manual review, "
+            "rather than an assumption of fraud or intentional non-compliance.\n"
             "5. Zero Automatic Modifications: In adherence to compliance integrity standards, the audit engine is read-only "
             "and never modifies clinical documentation or billed codes."
         )
@@ -515,15 +515,19 @@ class ComplianceReportGenerator:
                 "Occurs when an assigned ICD-10-CM code contradicts the documented diagnosis in the physician note. "
                 "For example, in encounter ENC-1002, Essential Hypertension was documented, but E11.9 (Type 2 Diabetes) "
                 "was assigned. In ENC-1008, Acute Bronchitis was documented, but Asthma (J45.909) was coded despite the note stating 'No wheezing'. "
-                "Such mismatches distort clinical registries and lead to claim recoupments."
+                "Such mismatches distort clinical registries and represent potential compliance risk requiring qualified manual review before claim submission."
             ),
             "Unsupported Procedure Medical Necessity": (
-                "Identified when CPT procedural codes lack medical necessity justification based on the reported primary diagnosis. "
-                "In encounter ENC-1003, CPT 45378 (Colonoscopy) was billed alongside acute pharyngitis without any gastrointestinal indication."
+                "Identified when reported CPT procedural codes present potential medical necessity concerns based on the assigned primary diagnosis. "
+                "For encounter ENC-1003 (CPT 45378 Colonoscopy with acute pharyngitis) and ENC-1015 (CPT 71046 Chest X-ray with acute URI), "
+                "the audit engine flags a potential medical necessity concern requiring comprehensive review of the complete clinical record, "
+                "secondary diagnoses, and applicable coverage policies (LCD/NCD), rather than concluding the services were medically unnecessary based solely on the primary diagnosis."
             ),
             "Missing Procedure Documentation": (
-                "Occurs when an invasive or diagnostic procedure CPT code is billed but the encounter lacks standalone operative or "
-                "imaging findings documentation (e.g. ENC-1003 colonoscopy or ENC-1015 chest x-ray). Represents an unsubstantiated service requiring chart retrieval."
+                "Occurs when a procedural or diagnostic CPT code is billed but the encounter documentation lacks the corresponding "
+                "procedure or diagnostic report. Specifically, invasive procedures like colonoscopy (ENC-1003) require formal procedure reports, "
+                "while diagnostic imaging like chest X-rays (ENC-1015, CPT 71046) require appropriate radiology documentation/reports (interpretation and report). "
+                "This represents an unverified service requiring pre-bill hold and record verification, not definitive proof of non-performance or improper coding."
             ),
             "Unsupported E/M Level": (
                 "Triggered when high-complexity Level 5 outpatient E/M codes (CPT 99215) are billed for uncomplicated conditions "
@@ -531,7 +535,7 @@ class ComplianceReportGenerator:
             ),
             "Missing Clinical Documentation": (
                 "Occurs when an encounter has codes assigned in the billing system but the clinical documentation progress note is "
-                "entirely absent (e.g., ENC-1020). Submitting claims with zero clinical documentation represents an acute False Claims liability."
+                "entirely absent (e.g., ENC-1020). Submitting claims with unpopulated clinical documentation represents a serious compliance risk requiring immediate chart retrieval and qualified manual review."
             ),
             "Missing Diagnosis Documentation": (
                 "Occurs when ICD-10 codes are populated on a claim line, but the Documented Diagnosis field is blank (e.g., ENC-1019). "
@@ -543,7 +547,7 @@ class ComplianceReportGenerator:
             ),
             "Missing Provider Signature": (
                 "Identified when encounter documentation lacks an authenticated clinician electronic signature (e.g., ENC-1011). "
-                "Medicare rules deem unauthenticated records non-reimbursable."
+                "Medicare guidelines indicate that unauthenticated records present a potential compliance risk and require provider signature authentication prior to claim submission."
             ),
             "Duplicate Diagnosis Entry": (
                 "Detected when identical ICD-10 codes are entered multiple times on the same encounter (e.g., ENC-1012). Causes clearinghouse claim rejections."
@@ -587,7 +591,7 @@ class ComplianceReportGenerator:
             ("Pre-Bill Claim Holds", "Place billing holds on encounters flagged with High Severity (ENC-1002, ENC-1003, ENC-1004, ENC-1008, ENC-1015, ENC-1018, ENC-1019, ENC-1020) to prevent immediate payer submission."),
             ("Physician Documentation Addenda", "Request attending clinician addenda for encounters with terse notes (ENC-1004) or missing progress notes (ENC-1020) before billing is finalized."),
             ("Electronic Signature Enforcement", "Route unsigned encounters (ENC-1011) back to the authoring provider for authenticated electronic signature and timestamp completion."),
-            ("Code Realignment & Removal", "Correct diagnostic codes to match documented conditions (re-align ENC-1002 to I10, ENC-1008 to acute bronchitis) and remove unperformed procedure CPTs (remove 45378 from ENC-1003, 71046 from ENC-1015)."),
+            ("Code Realignment & Pre-Bill Verification", "Align diagnostic codes to match documented conditions (e.g. re-align ENC-1002 to I10, ENC-1008 to acute bronchitis) and place billing holds on unverified procedures (CPT 45378 in ENC-1003, CPT 71046 in ENC-1015) pending chart verification and provider query; remove codes only if non-performance is formally established."),
             ("Downcoding Overbilled E/M", "Downcode encounter ENC-1018 from Level 5 (CPT 99215) to Level 3 (CPT 99213) in accordance with the documented low-complexity Medical Decision Making.")
         ]
         for title, desc in actions:
@@ -633,13 +637,14 @@ class ComplianceReportGenerator:
         self._add_section_heading("13. Conclusion")
         p = self.doc.add_paragraph()
         p.add_run(
-            f"The Medical Coding Compliance Audit Simulation demonstrated an overall encounter compliance rate of "
-            f"{self.summary.compliance_rate}%, identifying critical vulnerabilities in procedure substantiation, diagnostic "
-            f"alignment, and clinician electronic authentication. The identification of {self.summary.high_severity_count} "
-            f"high-severity discrepancies underscores the necessity of continuous compliance oversight.\n\n"
-            f"By executing timely corrective actions on flagged encounters and embedding automated EHR validation rules, "
-            f"healthcare organizations can protect against severe regulatory recoupment, maintain clinical documentation integrity, "
-            f"and uphold the highest standards of healthcare billing compliance."
+            f"The Medical Coding Compliance Audit Simulation evaluated 20 encounters against configured automated validation rules, "
+            f"with {self.summary.clean_records} encounters passing automated validation ({self.summary.compliance_rate}%) and "
+            f"{self.summary.records_flagged} encounters ({self.summary.review_rate}%) requiring qualified human auditor review. "
+            f"The audit engine flagged {self.summary.high_severity_count} high-severity potential compliance concerns across "
+            f"procedure substantiation, diagnostic alignment, and clinician electronic authentication.\n\n"
+            f"By implementing pre-bill holds, conducting qualified manual reviews, and embedding preventive EHR validation rules, "
+            f"healthcare organizations can mitigate potential compliance risks, preserve clinical documentation integrity, "
+            f"and ensure billing adheres to applicable coverage policies and coding standards."
         )
         p.paragraph_format.space_after = Pt(12)
 

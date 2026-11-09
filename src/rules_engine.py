@@ -481,7 +481,8 @@ def identify_documentation_deficiencies(record: PatientRecord, ref: ReferenceDat
                 severity=AuditSeverity.MEDIUM,
                 reason=(
                     "Clinical note lacks authenticated provider electronic signature, date/timestamp, or credential. "
-                    "Unauthenticated records fail Medicare Condition of Payment compliance."
+                    "Unauthenticated records represent a potential compliance risk under Medicare Conditions of Payment "
+                    "and require provider signature authentication prior to claim submission."
                 ),
                 recommended_action=(
                     "Route record back to attending provider for electronic authentication and signature completion."
@@ -523,6 +524,23 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
         if requires_proc_note:
             has_proc_mention = any(kw.lower() in notes_lower for kw in keywords)
             if not has_proc_mention:
+                is_imaging = "radiolog" in cpt_entry.get("description", "").lower() or cpt == "71046"
+                if is_imaging:
+                    doc_desc = "appropriate radiology documentation/report (interpretation and report)"
+                    retrieval_text = "Requires radiology report retrieval; not definitive proof of improper coding."
+                    action_text = (
+                        f"Initiate a pre-bill hold and verify encounter records. Locate and append standalone radiology "
+                        f"report/interpretation signed by performing or interpreting clinician; remove CPT [{cpt}] only "
+                        f"if non-performance is established."
+                    )
+                else:
+                    doc_desc = "formal procedure documentation/report"
+                    retrieval_text = "Requires procedure report retrieval; not definitive proof of improper coding."
+                    action_text = (
+                        f"Initiate a pre-bill hold and verify encounter records. Locate and append standalone procedure "
+                        f"report signed by performing clinician; remove CPT [{cpt}] only if non-performance is established."
+                    )
+
                 findings.append(
                     AuditFinding(
                         encounter_id=record.encounter_id,
@@ -533,14 +551,11 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
                         audit_issue=IssueType.MISSING_PROCEDURE_DOCUMENTATION.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
-                            f"CPT code [{cpt}] requires formal procedure documentation/report, but clinical note "
-                            f"contains no documentation of the procedure being performed or findings interpreted. "
-                            f"Requires operative report retrieval; not definitive proof of improper coding."
+                            f"CPT code [{cpt}] requires {doc_desc}, but clinical note "
+                            f"contains no documentation of the service being performed or findings interpreted. "
+                            f"{retrieval_text}"
                         ),
-                        recommended_action=(
-                            f"Locate and append standalone procedure report signed by performing clinician, "
-                            f"or remove CPT [{cpt}] prior to claim submission."
-                        ),
+                        recommended_action=action_text,
                         reference_guideline=ref.get_citation("missing_procedure_documentation"),
                         manual_review_required=True
                     )
@@ -561,12 +576,15 @@ def check_unsupported_procedures(record: PatientRecord, ref: ReferenceDataManage
                         audit_issue=IssueType.UNSUPPORTED_PROCEDURE.value,
                         severity=AuditSeverity.HIGH,
                         reason=(
-                            f"Documented diagnosis ('{record.documented_diagnosis}') and assigned ICD-10 "
-                            f"([{record.assigned_icd10}]) do not demonstrate medical necessity for procedure CPT [{cpt}]."
+                            f"Potential medical necessity concern: Documented primary diagnosis ('{record.documented_diagnosis}') "
+                            f"and assigned ICD-10 ([{record.assigned_icd10}]) do not readily establish coverage for procedure CPT [{cpt}]. "
+                            f"This finding does not conclude the procedure is unnecessary based only on the primary diagnosis, but identifies "
+                            f"a potential compliance concern requiring review of the complete clinical record and applicable coverage policies."
                         ),
                         recommended_action=(
-                            f"Review clinical medical necessity criteria. Ensure appropriate primary diagnostic indication "
-                            f"is documented and linked to procedure CPT [{cpt}]."
+                            f"Initiate a pre-bill hold and verify encounter records. Review the complete clinical record, physician orders, "
+                            f"and applicable coverage policies (LCD/NCD) to establish medical necessity before billing CPT [{cpt}]; "
+                            f"remove code only if non-performance or lack of medical necessity is established."
                         ),
                         reference_guideline=ref.get_citation("unsupported_procedure"),
                         manual_review_required=True
