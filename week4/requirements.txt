@@ -1,0 +1,9 @@
+# Week 4: Integration of Billing Software and Best Practices Implementation
+# Python Dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+python-docx>=1.0.0
+matplotlib>=3.7.0
+streamlit>=1.30.0
+pytest>=8.0.0
+openpyxl>=3.1.0

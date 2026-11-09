@@ -1,0 +1,239 @@
+{
+  "curriculum_title": "Role-Based Medical Billing System Integration Training Program",
+  "audience": "Evergreen Valley Family Medicine & Multi-Specialty Clinic Staff",
+  "passing_grade_percent": 85.0,
+  "modules": [
+    {
+      "module_id": "MOD-01",
+      "target_role": "Front-Desk Coordinators & Patient Access",
+      "title": "Front-Desk Master: Registration, Real-Time Eligibility & Point-of-Service Collections",
+      "duration_hours": 8.0,
+      "learning_objectives": [
+        "Master digital intake scanning and OCR document validation.",
+        "Execute and interpret real-time X12 270/271 insurance eligibility responses.",
+        "Identify inactive coverage, HMO primary care physician assignment gaps, and prior auth flags.",
+        "Calculate and collect exact patient copayments and deductible portions at check-in.",
+        "Enforce the zero-tolerance demographic duplicate prevention protocol."
+      ],
+      "practical_exercises": [
+        "Simulate 5 patient intake registrations with demographic anomaly detection.",
+        "Perform real-time eligibility inquiry on 3 commercial and 2 Medicare policies.",
+        "Process point-of-service copayment transaction and generate electronic receipt."
+      ]
+    },
+    {
+      "module_id": "MOD-02",
+      "target_role": "Clinical Providers (MD, DO, NP, PA) & Medical Assistants",
+      "title": "Clinical Documentation Integrity, Charge Slip Generation & Unsigned Note Governance",
+      "duration_hours": 6.0,
+      "learning_objectives": [
+        "Navigate structured EHR clinical documentation templates and smart phrases.",
+        "Select appropriate E/M service levels based on current applicable Medical Decision Making (MDM) or total time guidance, verified against encounter date of service and authorized CPT coding rules.",
+        "Complete electronic charge capture review before encounter closing.",
+        "Understand the clinical and financial consequences of unsigned notes and coding omissions.",
+        "Adhere to the mandatory 24-hour electronic signature compliance deadline."
+      ],
+      "practical_exercises": [
+        "Document a simulated complex Type 2 Diabetes encounter with 99214 MDM justification.",
+        "Review and sign an electronic charge slip with attached ICD-10 and CPT codes.",
+        "Respond to an automated EHR query regarding missing clinical documentation."
+      ]
+    },
+    {
+      "module_id": "MOD-03",
+      "target_role": "Certified Medical Coders (CPC / CCS)",
+      "title": "Advanced Real-Time Code Validation, NCCI Edits & Payer Edit Governance",
+      "duration_hours": 12.0,
+      "learning_objectives": [
+        "Configure and maintain the pre-bill validation rule engine.",
+        "Analyze and resolve NCCI Procedure-to-Procedure (PTP) edits and Medically Unlikely Edits (MUE).",
+        "Audit clinical records for medical necessity documentation supporting high-level E/M and minor procedures.",
+        "Apply CPT modifiers (-25, -59, -LT, -RT) strictly in accordance with CMS coding guidelines.",
+        "Execute the formal Provider Clarification Query protocol without leading the clinician."
+      ],
+      "practical_exercises": [
+        "Audit 5 complex outpatient encounters flagged by the scrubber for NCCI edit conflicts.",
+        "Draft a compliant, non-leading provider clarification query for an undocumented joint injection.",
+        "Test annual ICD-10-CM code update crosswalks in the sandbox environment."
+      ]
+    },
+    {
+      "module_id": "MOD-04",
+      "target_role": "Billing Specialists & Payment Posting Staff",
+      "title": "Electronic Claim Transmission (837P), Clearinghouse Reject Queues & ERA 835 Posting",
+      "duration_hours": 12.0,
+      "learning_objectives": [
+        "Manage daily electronic batch submissions of X12 837P professional claims.",
+        "Interpret clearinghouse 999 acknowledgments and 277CA claim acceptance reports.",
+        "Work the real-time clearinghouse rejection worklist with under-24-hour turnaround.",
+        "Oversee automated X12 835 Remittance Advice auto-posting and contractual write-off balancing.",
+        "Direct secondary crossover claims and generate clean electronic patient statements."
+      ],
+      "practical_exercises": [
+        "Correct and resubmit 3 claims rejected at the clearinghouse for NPI/taxonomy mismatches.",
+        "Post a simulated 835 ERA batch with contractual adjustments and reconcile to bank deposit.",
+        "Initiate an electronic appeal package for an improper medical necessity denial."
+      ]
+    },
+    {
+      "module_id": "MOD-05",
+      "target_role": "Practice Managers, Compliance Officers & RCM Supervisors",
+      "title": "Executive RCM Analytics, Denial Root-Cause Management & Regulatory Compliance",
+      "duration_hours": 8.0,
+      "learning_objectives": [
+        "Monitor the 11 key RCM integration KPIs across weekly and monthly executive dashboards.",
+        "Conduct root-cause denial analysis by CARC/RARC codes and provider documentation trends.",
+        "Oversee user access security controls, HIPAA audit log monitoring, and role-based permissions.",
+        "Audit the annual coding update release schedule and verify practice management fee schedules.",
+        "Maintain the integration risk register and coordinate quarterly disaster recovery simulations."
+      ],
+      "practical_exercises": [
+        "Analyze a monthly RCM dashboard and formulate an intervention plan for a 12% denial surge.",
+        "Perform a quarterly HIPAA audit log review of electronic PHI chart access records.",
+        "Calculate financial reconciliation variance across historical migration ledgers."
+      ]
+    }
+  ],
+  "assessment_questions": [
+    {
+      "question_id": "Q-01",
+      "target_role": "Front-Desk Coordinators",
+      "question": "When a real-time X12 271 eligibility inquiry returns a response indicating 'Inactive Policy / Coverage Terminated', what is the immediate mandatory protocol for front-desk staff?",
+      "options": [
+        "Allow the patient to see the provider and bill the insurance anyway hoping it is retroactive.",
+        "Verify coverage details with the payer, check for alternative active insurance or secondary coverage, explain available billing and payment options to the patient, and adhere to the practice's approved financial policy.",
+        "Cancel the appointment immediately without discussing options with the patient.",
+        "Assign a fictional policy number and route the claim to the billing supervisor."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Front-desk staff must immediately verify coverage status with the payer, check for secondary or alternative active insurance policies, explain billing options clearly to the patient, and adhere to the practice's approved financial policy rather than automatically demanding credit card payment or immediately cancelling the visit.",
+      "guideline_reference": "HFMA Patient Access Best Practices & CMS COB Guidelines"
+    },
+    {
+      "question_id": "Q-02",
+      "target_role": "Clinical Providers",
+      "question": "Under current applicable Evaluation and Management (E/M) office or other outpatient visit guidelines, what documentation criteria determine code selection for a high-complexity established patient encounter (e.g., CPT 99215) when selecting a level of service based on Medical Decision Making (MDM)?",
+      "options": [
+        "Documentation of a comprehensive 14-system review of systems and comprehensive past family/social history.",
+        "Meeting or exceeding the criteria for High complexity in at least two of the three MDM elements (Number and Complexity of Problems Addressed, Amount and/or Complexity of Data to be Reviewed and Analyzed, and Risk of Complications and/or Morbidity or Mortality of Patient Management), following applicable date-of-service guidance.",
+        "A rigid requirement that all three MDM elements meet the high-complexity threshold simultaneously.",
+        "Physician documented encounter time of at least 15 minutes, irrespective of the clinical problems addressed or data reviewed."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Under applicable E/M guidelines for office and outpatient visits, code selection based on Medical Decision Making requires meeting or exceeding the required level of complexity in at least two of the three MDM elements: (1) Number and Complexity of Problems Addressed, (2) Amount and/or Complexity of Data to be Reviewed and Analyzed, and (3) Risk of Complications and/or Morbidity or Mortality of Patient Management. Total time on the date of encounter is an alternate scoring basis. Specific thresholds and scoring definitions must be checked against the encounter date of service and authorized CPT guidance.",
+      "guideline_reference": "Applicable AMA CPT & CMS Evaluation and Management (E/M) Coding Guidelines (verified by Date of Service)"
+    },
+    {
+      "question_id": "Q-03",
+      "target_role": "Medical Coders",
+      "question": "When a minor surgical procedure (e.g., CPT 20610 Arthrocentesis) is performed on the same date of service as a significant, separately identifiable evaluation and management visit (CPT 99214), what modifier must be appended and where?",
+      "options": [
+        "Modifier -59 appended to CPT 20610.",
+        "Modifier -25 appended to CPT 99214.",
+        "Modifier -51 appended to CPT 99214.",
+        "Modifier -76 appended to CPT 20610."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Modifier -25 is appended to the E/M code (99214) to designate a significant, separately identifiable evaluation and management service performed by the same physician on the same day as a minor surgical procedure.",
+      "guideline_reference": "CMS NCCI Policy Manual, Chapter 1, Section E (Modifiers -25 and -59)"
+    },
+    {
+      "question_id": "Q-04",
+      "target_role": "Billing Specialists",
+      "question": "What is the primary operational purpose of the pre-bill 'Hard-Stop' validation rule in the integrated practice management software?",
+      "options": [
+        "To generate an informational banner that billing staff can permanently ignore.",
+        "To block the electronic generation and transmission of an X12 837P claim until fatal compliance errors (such as missing provider signature or invalid ICD-10 code) are rectified.",
+        "To automatically delete the encounter record from the database.",
+        "To change the assigned CPT code to a lower-paying service without human review."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Hard-stop validation rules completely prevent non-compliant or fatally flawed claims from entering the clearinghouse pipeline, eliminating downstream rejections and audit exposure.",
+      "guideline_reference": "AAPC Compliance Audit Standards & WEDI Pre-Bill Best Practices"
+    },
+    {
+      "question_id": "Q-05",
+      "target_role": "Data Migration Staff",
+      "question": "During legacy practice management data migration, why is a $0.00 financial reconciliation variance target established between the legacy accounts receivable trial balance and the target system ledger?",
+      "options": [
+        "To satisfy a statutory $0.00 variance threshold specifically mandated by AICPA SOC 2 Type II criteria.",
+        "As a proposed migration accounting and data-integrity control to verify that all patient balances and open insurance claims are completely accounted for without loss, duplication, or unauthorized write-offs.",
+        "Because modern relational database management systems cannot physically commit unequal ledger transactions.",
+        "It is an optional guideline that can be bypassed if the overall trial balance variance is under $5,000."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Achieving a $0.00 financial reconciliation variance is a proposed internal migration accounting and data-integrity control. SOC 2 evaluates an organization's controls against applicable Trust Services Criteria; it does not prescribe a universal $0.00 accounts-receivable migration variance. This control establishes that legacy open balances, unallocated credits, and insurance claims transferred into the new PM system without ledger variance or unapproved write-offs, maintaining general ledger auditability.",
+      "guideline_reference": "Healthcare Revenue Cycle Accounting Controls & HFMA Financial Data Governance Principles"
+    },
+    {
+      "question_id": "Q-06",
+      "target_role": "Practice Managers",
+      "question": "What is the industry-standard definition and proposed integration target for 'Days in Accounts Receivable' (DAR) in a high-performing multi-specialty outpatient practice?",
+      "options": [
+        "Total gross charges divided by 30 days; target: 90 days.",
+        "Total gross open AR divided by average daily billed charges; target: under 35 days.",
+        "Total claims submitted in a year; target: 365 days.",
+        "Number of days staff work per month; target: 20 days."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Days in AR equals Total Gross AR divided by Average Daily Billed Charges (Gross Charges / 90 days). A target under 35 days reflects a healthy, liquid revenue cycle.",
+      "guideline_reference": "MGMA Performance and Productivity Benchmarks"
+    },
+    {
+      "question_id": "Q-07",
+      "target_role": "Medical Coders",
+      "question": "When an annual ICD-10-CM code set update takes effect on October 1, how should encounters with dates of service on or after October 1 that use deleted codes be handled?",
+      "options": [
+        "Submitted with the old code because the patient was diagnosed earlier.",
+        "Flagged by pre-bill scrubber hard-stops and crosswalked to the newly effective specific ICD-10-CM code for the current fiscal year.",
+        "Automatically converted to unlisted diagnosis code R69.",
+        "Written off as non-billable charity care."
+      ],
+      "correct_option_index": 1,
+      "explanation": "ICD-10-CM codes are strictly governed by the Date of Service. Encounters occurring on or after October 1 must use the valid code set for that fiscal year; deleted codes result in immediate claim rejections.",
+      "guideline_reference": "CMS & CDC National Center for Health Statistics (NCHS) ICD-10-CM Official Guidelines"
+    },
+    {
+      "question_id": "Q-08",
+      "target_role": "Billing Specialists",
+      "question": "What does Claim Adjustment Reason Code (CARC) 16 signify when received on an electronic remittance advice (X12 835)?",
+      "options": [
+        "Claim lacks information or has submission/billing error(s) which are needed for adjudication.",
+        "Procedure code is inconsistent with the modifier used.",
+        "Service not covered under the patient's benefit plan.",
+        "Payment was made to an out-of-network provider."
+      ],
+      "correct_option_index": 0,
+      "explanation": "CARC 16 denotes: 'Claim/service lacks information or has submission/billing error(s) which is needed for adjudication.' Accompanied by Remittance Advice Remark Codes (RARC) specifying the exact missing element.",
+      "guideline_reference": "X12 / Washington Publishing Company (WPC) CARC/RARC Standard Code List"
+    },
+    {
+      "question_id": "Q-09",
+      "target_role": "Compliance Officers",
+      "question": "Under the HIPAA Security Rule (45 CFR Part 164, Subpart C), what is the regulatory structure governing the protection of electronic Protected Health Information (ePHI) transmitted over electronic communications networks?",
+      "options": [
+        "Transmission security is completely optional for covered entities with fewer than 50 healthcare workers.",
+        "Transmission security safeguards are a required standard under 45 CFR \u00a7 164.312(e)(1), while encryption under \u00a7 164.312(e)(2)(ii) is an addressable implementation specification (e.g., implemented via modern protocols such as TLS 1.3 as a proposed technical safeguard).",
+        "Federal statutory law strictly mandates TLS 1.3 encryption and explicitly criminalizes all alternative cryptographic cipher suites.",
+        "Covered entities may transmit unencrypted ePHI across public networks provided patient social security numbers are redacted."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Under 45 CFR \u00a7 164.312(e)(1), transmission security is a required standard to guard against unauthorized access to ePHI transmitted over electronic communications networks. However, encryption under \u00a7 164.312(e)(2)(ii) is classified as an 'addressable' implementation specification rather than an inflexible statutory mandate. Covered entities must assess whether encryption is reasonable and appropriate, implementing robust protocols such as TLS 1.3 as a proposed technical standard or implementing equivalent alternative safeguards.",
+      "guideline_reference": "45 CFR \u00a7 164.312(e) (HIPAA Security Rule: Transmission Security Standards & Addressable Implementation Specifications)"
+    },
+    {
+      "question_id": "Q-10",
+      "target_role": "Practice Managers",
+      "question": "If an automated claim scrubber detects a potential medical necessity gap between a procedure and diagnosis code, what is the proper operational resolution?",
+      "options": [
+        "Alter the diagnosis code to a covered diagnosis without reviewing medical records.",
+        "Route the encounter to a certified medical coder for clinical record review and, if necessary, issue a non-leading clarification query to the provider.",
+        "Delete the procedure from the claim and bill only the office visit.",
+        "Submit the claim anyway and wait for the payer to deny it."
+      ],
+      "correct_option_index": 1,
+      "explanation": "Never change codes to match coverage policies without clinical documentation support. A certified coder must review the chart and query the clinician if necessary to ensure coding compliance.",
+      "guideline_reference": "AHIMA & AAPC Standards of Ethical Coding"
+    }
+  ]
+}
