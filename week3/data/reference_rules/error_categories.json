@@ -1,0 +1,184 @@
+{
+  "categories": {
+    "ERR_ICD_INCORRECT": {
+      "name": "Incorrect ICD-10 Diagnosis Code",
+      "group": "Coding & Documentation",
+      "default_severity": "High",
+      "description": "The assigned ICD-10-CM code does not match the clinical pathology or diagnosis documented in the medical record (e.g., chronic code billed for acute injury).",
+      "carc_mapping": ["CARC 11", "CARC 167"],
+      "rarc_mapping": ["RARC N382"],
+      "responsible_department": "HIM / Medical Coding",
+      "prevention_control": "Clinical documentation improvement (CDI) reviews and automated acute vs. chronic code cross-checks."
+    },
+    "ERR_ICD_SPECIFICITY": {
+      "name": "Diagnosis Code Specificity Mismatch",
+      "group": "Coding & Documentation",
+      "default_severity": "Medium",
+      "description": "An unspecified or low-specificity diagnosis code was billed when specific anatomical, laterality, or manifestation details were explicitly documented in the chart.",
+      "carc_mapping": ["CARC 16", "CARC 167"],
+      "rarc_mapping": ["RARC M81"],
+      "responsible_department": "HIM / Medical Coding",
+      "prevention_control": "EHR coding scrubbers prompting coders when unspecified codes (e.g., .9) are selected despite detailed progress notes."
+    },
+    "ERR_CPT_INCORRECT": {
+      "name": "Incorrect CPT Procedure Code",
+      "group": "Coding & Documentation",
+      "default_severity": "High",
+      "description": "The billed CPT procedure or E/M code fails to correspond to the service documented (e.g., initial preventive code billed for established patient).",
+      "carc_mapping": ["CARC 4", "CARC 16"],
+      "rarc_mapping": ["RARC N56"],
+      "responsible_department": "HIM / Charge Entry",
+      "prevention_control": "Chargemaster crosswalk validation and patient type verification rules in the practice management system."
+    },
+    "ERR_DUPLICATE_BILLING": {
+      "name": "Duplicate Procedure Billing",
+      "group": "Charge Capture & Billing",
+      "default_severity": "High",
+      "description": "The same procedure code was billed multiple times for the same patient, date of service, and provider without appropriate modifier or documented distinct encounter.",
+      "carc_mapping": ["CARC 18"],
+      "rarc_mapping": ["RARC N522"],
+      "responsible_department": "Billing / Charge Entry",
+      "prevention_control": "Automated pre-bill duplicate charge scrubbing rules with hard-stop flags on identical CPT/date combinations."
+    },
+    "ERR_EM_UNSUPPORTED": {
+      "name": "Unsupported E/M Service Level",
+      "group": "Coding & Documentation",
+      "default_severity": "High",
+      "description": "Evaluation and Management (E/M) code complexity level exceeds what is supported by the documented Medical Decision Making (MDM) or total encounter time under AMA/CMS 2021/2023 guidelines.",
+      "carc_mapping": ["CARC 150"],
+      "rarc_mapping": ["RARC N34"],
+      "responsible_department": "Clinical Staff / HIM",
+      "prevention_control": "Provider documentation coaching on MDM criteria and EHR smart templates calculating complexity levels based on chart data."
+    },
+    "ERR_SIGNATURE_MISSING": {
+      "name": "Missing Provider Signature / Unauthenticated Record",
+      "group": "Clinical Documentation",
+      "default_severity": "Critical",
+      "description": "The clinical progress note lacks an authenticated electronic signature from the rendering clinician, violating Medicare Conditions of Payment and commercial contract rules.",
+      "carc_mapping": ["CARC 16"],
+      "rarc_mapping": ["RARC MA130", "EDI 277CA STC: A7"],
+      "responsible_department": "Clinical Providers",
+      "prevention_control": "EHR system configuration prohibiting claim generation or bill release until progress notes are locked and signed."
+    },
+    "ERR_DOCUMENTATION_MISSING": {
+      "name": "Missing Clinical Documentation",
+      "group": "Clinical Documentation",
+      "default_severity": "Critical",
+      "description": "A billed procedure or test lacks any accompanying operative note, diagnostic report, or progress note narrative in the medical record repository.",
+      "carc_mapping": ["CARC 16", "CARC 252"],
+      "rarc_mapping": ["RARC N29"],
+      "responsible_department": "Clinical Staff / Health Information Management",
+      "prevention_control": "Procedural charge capture tied to signed procedure note templates; unlinked charges route to review workqueues."
+    },
+    "ERR_SUBSCRIBER_INFO": {
+      "name": "Missing Insurance Subscriber Information",
+      "group": "Front-End Registration & Eligibility",
+      "default_severity": "High",
+      "description": "Claim lacks valid subscriber identification, policy group number, or relationship code (e.g., minor patient submitted as primary insured).",
+      "carc_mapping": ["CARC 16", "CARC 26"],
+      "rarc_mapping": ["RARC MA61", "EDI 277CA STC: A7"],
+      "responsible_department": "Patient Registration / Front Desk",
+      "prevention_control": "Mandatory subscriber verification fields in registration software with required guarantor linkage for minors."
+    },
+    "ERR_DEMOGRAPHIC_TYPO": {
+      "name": "Incorrect Patient Demographic Information",
+      "group": "Front-End Registration & Eligibility",
+      "default_severity": "Medium",
+      "description": "Patient legal name, date of birth, or gender submitted on claim conflicts with payer eligibility file records due to manual transcription errors.",
+      "carc_mapping": ["CARC 16", "CARC 31"],
+      "rarc_mapping": ["RARC N245", "EDI 277CA STC: A7"],
+      "responsible_department": "Patient Registration / Front Desk",
+      "prevention_control": "Real-time eligibility (EDI 270/271) verification at patient check-in cross-referencing payer demographic databases with government ID."
+    },
+    "ERR_AUTH_REFERRAL_MISSING": {
+      "name": "Missing HMO Referral or Prior Authorization",
+      "group": "Front-End Authorization",
+      "default_severity": "High",
+      "description": "Specialist service, advanced diagnostic imaging, or restricted procedure was performed without obtaining mandatory pre-certification or PCP referral.",
+      "carc_mapping": ["CARC 197"],
+      "rarc_mapping": ["RARC N381"],
+      "responsible_department": "Prior Authorization / Referral Coordination",
+      "prevention_control": "Electronic referral tracking module with appointment scheduling hard-stops if authorized referral number is missing."
+    },
+    "ERR_MEDICAL_NECESSITY": {
+      "name": "Medical Necessity Documentation Gap",
+      "group": "Coding & Documentation",
+      "default_severity": "High",
+      "description": "The billed service lacks supporting clinical indication or fails Local/National Coverage Determinations (LCD/NCD) for the primary diagnosis linked.",
+      "carc_mapping": ["CARC 50"],
+      "rarc_mapping": ["RARC N115"],
+      "responsible_department": "Clinical Providers / HIM",
+      "prevention_control": "Point-of-care clinical decision support (CDS) in EHR alerting physicians when ordered tests fail LCD medical necessity."
+    },
+    "ERR_MODIFIER_APPLICATION": {
+      "name": "Incorrect Modifier Application",
+      "group": "Coding & Billing",
+      "default_severity": "High",
+      "description": "Failure to append mandatory modifier (e.g., Modifier 25 for significant separate E/M) or improper modifier usage resulting in NCCI bundling denials.",
+      "carc_mapping": ["CARC 4", "CARC 97"],
+      "rarc_mapping": ["RARC N56"],
+      "responsible_department": "HIM / Medical Coding",
+      "prevention_control": "NCCI edit claim scrubber modules screening dual-service claims (minor surgery + E/M) for Modifier 25 documentation criteria."
+    },
+    "ERR_UNITS_QUANTITY": {
+      "name": "Incorrect Units or Quantity Billed",
+      "group": "Charge Capture & Billing",
+      "default_severity": "High",
+      "description": "Service units billed exceed Medically Unlikely Edits (MUE) thresholds or represent clerical transcription errors (e.g., minutes entered as units).",
+      "carc_mapping": ["CARC 151"],
+      "rarc_mapping": ["RARC N362"],
+      "responsible_department": "Charge Entry / Billing",
+      "prevention_control": "Pre-bill claim scrubber configured with CMS Medically Unlikely Edit (MUE) limits and dosage-to-unit conversion calculators."
+    },
+    "ERR_COB_ROUTING": {
+      "name": "Coordination of Benefits (COB) Error",
+      "group": "Front-End Registration & Eligibility",
+      "default_severity": "High",
+      "description": "Claim was submitted to a secondary or retiree health plan as primary, bypassing the patient's active primary insurer (e.g., Medicare Part B).",
+      "carc_mapping": ["CARC 22"],
+      "rarc_mapping": ["RARC N103"],
+      "responsible_department": "Patient Registration / Billing",
+      "prevention_control": "Annual coordination of benefits screening questionnaire at patient check-in and automated Medicare Secondary Payer (MSP) screening."
+    },
+    "ERR_CALCULATION_BALANCE": {
+      "name": "Incorrect Deductible/Copay/Coinsurance Calculation",
+      "group": "Payment Posting & Patient Accounting",
+      "default_severity": "High",
+      "description": "Patient cost-sharing calculation error violating balance-billing laws or double-counting copays and deductibles beyond the contractual allowed amount.",
+      "carc_mapping": ["INTERNAL_AUDIT_ALERT"],
+      "rarc_mapping": ["PATIENT_BILLING_DISCREPANCY"],
+      "responsible_department": "Payment Posting / Patient Financial Services",
+      "prevention_control": "Strict waterfall accounting engine in practice management software enforcing Insurer Paid + Patient Due = Allowed Amount."
+    },
+    "ERR_SUBMISSION_REJECTED": {
+      "name": "Claim Rejected Due to Incomplete Submission Information",
+      "group": "EDI & Technical Clearinghouse",
+      "default_severity": "Critical",
+      "description": "Claim file failed HIPAA structural syntax or clearinghouse validation due to unmapped provider NPI or invalid loop qualifiers.",
+      "carc_mapping": ["CARC 16"],
+      "rarc_mapping": ["EDI 277CA STC: A7"],
+      "responsible_department": "Billing / IT Systems",
+      "prevention_control": "Clearinghouse gateway pre-parser validating ANSI ASC X12N 837P envelope structures and provider taxonomy tables."
+    },
+    "QUERY_NO_ERROR": {
+      "name": "Auditing Review – No Error Identified",
+      "group": "Auditing & Compliance",
+      "default_severity": "Low",
+      "description": "A billing query or internal audit threshold triggered a review, but thorough clinical chart and guideline inspection confirmed compliant coding.",
+      "carc_mapping": ["N/A"],
+      "rarc_mapping": ["N/A"],
+      "responsible_department": "Compliance / Audit Review",
+      "prevention_control": "Refine internal audit query rules to reduce unnecessary administrative holds on validated encounters."
+    },
+    "QUERY_PENDING_DOCS": {
+      "name": "Clinical Documentation Deficiency – Pending Records",
+      "group": "Clinical Documentation",
+      "default_severity": "Medium",
+      "description": "High-risk prescription or treatment initiated based on external clinical documents (e.g., outside consultation/labs) that have not been uploaded into EHR.",
+      "carc_mapping": ["CARC 16", "CARC 252"],
+      "rarc_mapping": ["RARC N29"],
+      "responsible_department": "Medical Records / Clinical Staff",
+      "prevention_control": "EHR checklist requiring external specialist consult notes and lab panels to be scanned before completing visit encounter."
+    }
+  }
+}

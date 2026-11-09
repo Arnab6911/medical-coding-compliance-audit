@@ -1,0 +1,220 @@
+{
+  "resolution_protocols": {
+    "ERR_ICD_INCORRECT": {
+      "steps": [
+        "1. Identify the discrepancy between the documented condition in the clinical note and the billed ICD-10-CM code.",
+        "2. Review the full clinical progress note to determine onset, etiology, laterality, and episode of care (initial, subsequent, sequela).",
+        "3. Cross-reference official FY 2024 ICD-10-CM Tabular List and Index for the correct diagnostic code.",
+        "4. Prepare a coding correction ticket documenting the chart excerpt and revised code rationale.",
+        "5. Void original unadjudicated claim or submit an EDI 837P replacement claim (Claim Frequency Code 7) with corrected ICD-10.",
+        "6. Document the resolution in the billing ledger and verify payer acceptance via 277CA."
+      ],
+      "required_evidence": ["Physician progress note", "Injury history documentation", "FY 2024 ICD-10-CM coding reference rule"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_ICD_SPECIFICITY": {
+      "steps": [
+        "1. Identify the unspecified diagnosis code on the claim line.",
+        "2. Inspect the complete medical record, including past medical history, lab results (e.g., eGFR, HbA1c), and physical exam.",
+        "3. Identify the highest level of clinical specificity documented by the attending provider.",
+        "4. Replace the unspecified code with the specific primary code and secondary manifestation codes as required by FY 2024 guidelines.",
+        "5. Transmit a corrected electronic claim (EDI 837P Type of Bill / Frequency 7) to the health plan.",
+        "6. Close the internal audit query and update coder educational log."
+      ],
+      "required_evidence": ["Progress note assessment and plan", "Laboratory reports (e.g. eGFR staging)", "Coding clinic specificity guidelines"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_CPT_INCORRECT": {
+      "steps": [
+        "1. Review the clinical service rendered against the billed CPT code definition.",
+        "2. Check patient billing history to confirm patient status (new patient: no professional services within 3 years; established patient: seen within 3 years).",
+        "3. Select the correct CPT code reflecting actual encounter status and clinical work performed.",
+        "4. Recalculate Chargemaster gross charge and contractual allowance based on fee schedule.",
+        "5. Submit corrected claim with corrected CPT code.",
+        "6. Reconcile accounts receivable balance."
+      ],
+      "required_evidence": ["Practice management appointment history (last 3 years)", "Clinical progress note", "CPT 2024 code definitions"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_DUPLICATE_BILLING": {
+      "steps": [
+        "1. Inspect the claim lines for identical CPT codes, date of service, and provider.",
+        "2. Verify whether multiple independent procedures were clinically performed (which would require Modifier 59/XS) or if a clerical duplication occurred.",
+        "3. Confirm from operative/diagnostic report that only a single procedure was executed.",
+        "4. Void/cancel the duplicate service line in the practice management system.",
+        "5. Post a full credit/adjustment for the duplicate gross charge ($0.00 patient balance).",
+        "6. If payer already paid duplicate in error, initiate voluntary refund/takeback reconciliation."
+      ],
+      "required_evidence": ["Diagnostic test tracing/report", "Billing charge audit log", "Remittance advice showing CARC 18 denial"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_EM_UNSUPPORTED": {
+      "steps": [
+        "1. Review the progress note against AMA/CMS 2021/2023 E/M documentation guidelines for Medical Decision Making (MDM).",
+        "2. Evaluate the 3 MDM elements: Number and complexity of problems addressed, amount/complexity of data reviewed, and risk of complications/morbidity.",
+        "3. Determine the supported E/M level (e.g., downcoding from Level 5 to Level 3).",
+        "4. Issue a formal coding notification to the rendering clinician explaining the downcoding rationale.",
+        "5. Submit a corrected claim reflecting the supported E/M code (e.g., 99213) and revised charge.",
+        "6. Update provider education dashboard."
+      ],
+      "required_evidence": ["Clinical note narrative", "AMA 2024 MDM scoring grid", "Face-to-face time documentation if time-based"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_SIGNATURE_MISSING": {
+      "steps": [
+        "1. Flag the unauthenticated progress note in the billing pre-scrubber workqueue.",
+        "2. Place an immediate billing hold on the encounter to prevent premature transmission.",
+        "3. Route an urgent EHR chart completion notification to the rendering provider.",
+        "4. Provider reviews, authenticates, and applies compliant electronic signature with timestamp.",
+        "5. Validate that chart status shifts from 'Draft' to 'Signed / Finalized'.",
+        "6. Release the billing hold and transmit the clean EDI 837P claim to clearinghouse."
+      ],
+      "required_evidence": ["EHR audit log with signature timestamp", "Medicare Program Integrity Manual MLN MM6698"],
+      "resolution_status": "Resolved – Documentation Updated"
+    },
+    "ERR_DOCUMENTATION_MISSING": {
+      "steps": [
+        "1. Review encounter charge ledger against EHR document repository.",
+        "2. Confirm that the billed procedural code (e.g., CPT 11102) has no documented procedure note or pathology report.",
+        "3. Place a strict billing hold on the claim.",
+        "4. Issue an official Provider Query to the attending physician requesting missing documentation.",
+        "5. If provider provides signed late entry with clinical justification, attach note and release claim.",
+        "6. If provider confirms procedure was not performed or cannot be substantiated, delete the charge from the billing ledger."
+      ],
+      "required_evidence": ["EHR document index", "Written provider query form", "Pathology or procedural log"],
+      "resolution_status": "Pending Provider Query"
+    },
+    "ERR_SUBSCRIBER_INFO": {
+      "steps": [
+        "1. Review the clearinghouse EDI 277CA rejection report (STC: A7 / CARC 16).",
+        "2. Contact patient/parent guarantor to obtain correct subscriber ID, policy number, and employer group.",
+        "3. Update practice management Master Patient Index (MPI) with parent as primary subscriber and minor as dependent.",
+        "4. Re-execute real-time eligibility verification (EDI 270/271) to confirm active coverage.",
+        "5. Regenerate clean ANSI ASC X12N 837P claim file with valid Loop 2000B/2010BA data.",
+        "6. Transmit to clearinghouse and monitor 277CA acknowledgment."
+      ],
+      "required_evidence": ["Insurance card copy (front/back)", "EDI 271 eligibility response", "Updated guarantor demographic record"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_DEMOGRAPHIC_TYPO": {
+      "steps": [
+        "1. Retrieve the clearinghouse demographic mismatch rejection notice (CARC 31).",
+        "2. Compare practice management registration data with patient intake form and driver's license / birth record.",
+        "3. Identify the typographical error (e.g., transposed month and day in DOB).",
+        "4. Correct the date of birth in the Master Patient Index and payer master record.",
+        "5. Re-run real-time eligibility check (EDI 270/271) to ensure match with payer database.",
+        "6. Resubmit corrected claim to clearinghouse."
+      ],
+      "required_evidence": ["Government-issued photo ID", "Patient intake document", "EDI 271 verification confirmation"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_AUTH_REFERRAL_MISSING": {
+      "steps": [
+        "1. Identify the HMO specialist visit denied under CARC 197 / RARC N381.",
+        "2. Check if a valid referral was issued by the Primary Care Physician (PCP) prior to the visit but not linked to the appointment.",
+        "3. If referral exists in external health system portal, retrieve referral number and attach to claim.",
+        "4. If no referral was issued, submit an urgent retroactive referral request to the PCP office with clinical consultation notes.",
+        "5. If retroactive referral is approved, resubmit claim with referral authorization number in Loop 2300.",
+        "6. If referral is definitively denied, write off the charge per in-network HMO contract rules (patient held harmless; zero balance billing)."
+      ],
+      "required_evidence": ["PCP referral documentation", "Retroactive authorization appeal letter", "Payer HMO contract guidelines"],
+      "resolution_status": "Pending Additional Documentation"
+    },
+    "ERR_MEDICAL_NECESSITY": {
+      "steps": [
+        "1. Inspect Local Coverage Determination (LCD) policy for the billed procedure code.",
+        "2. Review the clinical progress note to identify whether symptoms or clinical indications were documented but not coded.",
+        "3. If clinical symptoms (e.g., dyspnea, abnormal auscultation) were documented, update diagnosis coding to include the covered indication.",
+        "4. If no medical necessity indication exists and the service was purely routine screening without documented clinical basis, hold billing for compliance officer review.",
+        "5. If confirmed non-covered and no Advance Beneficiary Notice (ABN) was signed prior to service, write off the charge. Patient cannot be billed.",
+        "6. Educate clinical staff on pre-ordering coverage checks."
+      ],
+      "required_evidence": ["CMS LCD coverage policy", "Complete clinical note", "Compliance committee review determination"],
+      "resolution_status": "Escalated for Human Review"
+    },
+    "ERR_MODIFIER_APPLICATION": {
+      "steps": [
+        "1. Review the NCCI bundling denial (CARC 97) for the Evaluation and Management service billed alongside minor surgery.",
+        "2. Inspect the clinical documentation to confirm if the E/M service addressed a significant, separately identifiable medical problem beyond normal pre/post-operative care.",
+        "3. Verify that the documented history, exam, and medical decision making for the separate condition stand alone.",
+        "4. Append Modifier -25 to the appropriate E/M CPT code (e.g., CPT 99214-25).",
+        "5. Submit a formal corrected claim or administrative appeal packet with supporting clinical documentation.",
+        "6. Track ERA 835 remittance for unbundled reimbursement."
+      ],
+      "required_evidence": ["Separate clinical SOAP note", "NCCI Policy Manual Chapter 1 General Correct Coding Guidelines", "Revised claim with Modifier 25"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_UNITS_QUANTITY": {
+      "steps": [
+        "1. Review the Medically Unlikely Edit (MUE) denial under CARC 151 / RARC N362.",
+        "2. Inspect the clinical infusion/administration record to verify start time, stop time, and total elapsed duration (e.g., 45 minutes).",
+        "3. Review CPT guidelines for code 96360 (initial hydration, 31 to 60 minutes = 1 unit).",
+        "4. Correct the billing charge line from 4 units to 1 unit.",
+        "5. Adjust the practice management charge ledger to reflect the single-unit retail charge ($130.00).",
+        "6. Transmit corrected claim to payer for adjudication."
+      ],
+      "required_evidence": ["Nursing flow sheet with infusion start/stop times", "CMS MUE table for HCPCS/CPT", "Adjusted charge entry ledger"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_COB_ROUTING": {
+      "steps": [
+        "1. Review the CARC 22 denial indicating primary coverage under another plan.",
+        "2. Review patient age and Medicare entitlement status (patient turned 65; Medicare Part B is active primary).",
+        "3. Update payer hierarchy in the practice management system: Medicare Part B as Primary, BCBS as Secondary.",
+        "4. Format and transmit a primary electronic claim (EDI 837P) to Medicare Part B.",
+        "5. Await Medicare ERA 835 remittance advice.",
+        "6. Upon receipt of Medicare payment, cross over or submit secondary claim with primary ERA 835 CAS segments to BCBS for secondary cost-sharing payment."
+      ],
+      "required_evidence": ["Medicare red-white-and-blue card", "COB questionnaire", "Payer primary determination letter"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_CALCULATION_BALANCE": {
+      "steps": [
+        "1. Audit the patient account ledger against the payer Electronic Remittance Advice (ERA 835).",
+        "2. Calculate the correct cost-sharing waterfall: Contractual Allowed Amount minus Deductible applied minus Copay minus Coinsurance.",
+        "3. Identify calculation defect where practice management script billed patient $164.40 on an allowable fee of $112.00.",
+        "4. Calculate exact enforceable patient liability: $50.00 deductible + $12.40 coinsurance = $62.40.",
+        "5. Void the erroneous patient billing statement.",
+        "6. Issue an immediate ledger adjustment credit and generate a corrected itemized statement for $62.40 with written apology."
+      ],
+      "required_evidence": ["Payer ERA 835 remittance", "Practice management journal ledger", "Corrected patient billing statement"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "ERR_SUBMISSION_REJECTED": {
+      "steps": [
+        "1. Review clearinghouse 277CA syntax report identifying missing Box 24J/33a rendering NPI.",
+        "2. Inspect practice management system provider dictionary and taxonomy lookup tables.",
+        "3. Re-link rendering clinician's Type 1 individual National Provider Identifier (NPI 1982736450).",
+        "4. Validate that Box 33 billing group NPI and Box 24J rendering NPI populate correctly in Loop 2310B.",
+        "5. Re-run claim through pre-submission scrubber to verify clean claim status.",
+        "6. Resubmit EDI 837P file to clearinghouse and confirm 277CA acceptance acknowledgment."
+      ],
+      "required_evidence": ["NPPES NPI Registry confirmation", "Clearinghouse 277CA electronic report", "EHR provider configuration file"],
+      "resolution_status": "Resolved – Corrected Claim"
+    },
+    "QUERY_NO_ERROR": {
+      "steps": [
+        "1. Review the internal audit threshold alert flagging high-level E/M code CPT 99215.",
+        "2. Conduct independent audit of clinical progress note for Medical Decision Making (MDM) and encounter duration.",
+        "3. Confirm documented acute life-threatening presentation (severe chest pain, diaphoresis, acute cardiac transfer) meeting High MDM criteria.",
+        "4. Confirm face-to-face physician time of 50 minutes strictly meets CPT 99215 threshold.",
+        "5. Conclude that CPT 99215 and associated diagnosis codes are fully supported by clinical documentation.",
+        "6. Document 'No Error Identified' in audit log, release claim for billing, and adjust automated audit query rules to avoid unnecessary alerts on acute cardiac encounters."
+      ],
+      "required_evidence": ["Comprehensive clinical SOAP note", "ECG tracing and emergency transfer record", "AMA 2024 MDM scoring guideline"],
+      "resolution_status": "No Error Identified"
+    },
+    "QUERY_PENDING_DOCS": {
+      "steps": [
+        "1. Review compliance auditor finding regarding high-risk medication initiation without source records in EHR.",
+        "2. Inspect medical record to confirm that outside rheumatology consultation report and autoimmune lab panels are referenced in text but absent from media repository.",
+        "3. Place an interim billing hold on the encounter claim.",
+        "4. Task medical records / clinical assistant to contact external rheumatology facility to obtain formal consultation report and laboratory serologies.",
+        "5. Scan and index external records into the patient's EHR chart.",
+        "6. Re-evaluate documentation completeness; once verified, release claim for billing."
+      ],
+      "required_evidence": ["EHR document checklist", "External medical record request form", "Incoming external consultation record"],
+      "resolution_status": "Pending Additional Documentation"
+    }
+  }
+}
