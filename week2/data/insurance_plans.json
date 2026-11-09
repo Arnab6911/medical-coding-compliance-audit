@@ -1,0 +1,91 @@
+{
+  "version": "2024.1 (Simulation Assumption)",
+  "disclaimer": "Fictional insurance plans and parameters created for educational billing process simulation. Does not represent actual payer benefit structures.",
+  "plans": {
+    "BCBS_PPO": {
+      "payer_id": "BCBS001",
+      "payer_name": "Blue Cross Blue Shield",
+      "plan_name": "Preferred Choice PPO",
+      "plan_type": "PPO",
+      "copay_pcp": 30.00,
+      "copay_specialist": 50.00,
+      "copay_preventive": 0.00,
+      "annual_deductible": 500.00,
+      "coinsurance_rate": 0.20,
+      "oop_max": 4000.00,
+      "requires_referral": false,
+      "prior_auth_procedures": ["45378"]
+    },
+    "UHC_POS": {
+      "payer_id": "UHC002",
+      "payer_name": "UnitedHealthcare",
+      "plan_name": "Choice Plus POS",
+      "plan_type": "POS",
+      "copay_pcp": 25.00,
+      "copay_specialist": 45.00,
+      "copay_preventive": 0.00,
+      "annual_deductible": 1000.00,
+      "coinsurance_rate": 0.20,
+      "oop_max": 5000.00,
+      "requires_referral": false,
+      "prior_auth_procedures": ["45378"]
+    },
+    "AETNA_HMO": {
+      "payer_id": "AETNA003",
+      "payer_name": "Aetna Health",
+      "plan_name": "Open Access HMO",
+      "plan_type": "HMO",
+      "copay_pcp": 20.00,
+      "copay_specialist": 40.00,
+      "copay_preventive": 0.00,
+      "annual_deductible": 0.00,
+      "coinsurance_rate": 0.10,
+      "oop_max": 3000.00,
+      "requires_referral": true,
+      "prior_auth_procedures": ["45378", "71046"]
+    },
+    "MEDICARE_B": {
+      "payer_id": "CMS001",
+      "payer_name": "Medicare Part B",
+      "plan_name": "Traditional Fee-for-Service",
+      "plan_type": "Medicare",
+      "copay_pcp": 0.00,
+      "copay_specialist": 0.00,
+      "copay_preventive": 0.00,
+      "annual_deductible": 240.00,
+      "coinsurance_rate": 0.20,
+      "oop_max": 0.00,
+      "requires_referral": false,
+      "prior_auth_procedures": []
+    },
+    "CIGNA_HDHP": {
+      "payer_id": "CIGNA005",
+      "payer_name": "Cigna HealthCare",
+      "plan_name": "Advantage HDHP with HSA",
+      "plan_type": "HDHP",
+      "copay_pcp": 0.00,
+      "copay_specialist": 0.00,
+      "copay_preventive": 0.00,
+      "annual_deductible": 2500.00,
+      "coinsurance_rate": 0.10,
+      "oop_max": 6000.00,
+      "requires_referral": false,
+      "prior_auth_procedures": ["45378"]
+    },
+    "SELF_PAY": {
+      "payer_id": "SELF000",
+      "payer_name": "Self-Pay",
+      "plan_name": "Uninsured / Self-Pay Policy",
+      "plan_type": "Self-Pay",
+      "copay_pcp": 0.00,
+      "copay_specialist": 0.00,
+      "copay_preventive": 0.00,
+      "annual_deductible": 0.00,
+      "coinsurance_rate": 0.00,
+      "oop_max": 0.00,
+      "self_pay_discount_rate": 0.30,
+      "requires_referral": false,
+      "prior_auth_procedures": []
+    }
+  }
+}

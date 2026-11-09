@@ -1,0 +1,231 @@
+{
+  "version": "ICD-10-CM FY 2024 (Historical Educational Reference Subset)",
+  "code_set_year": "FY 2024 (Historical)",
+  "source": "Centers for Medicare & Medicaid Services (CMS) / National Center for Health Statistics (NCHS)",
+  "last_updated": "2024-10-01",
+  "disclaimer": "Historical Reference Notice: This code subset is provided strictly for educational compliance simulation and training purposes using historical FY 2024 standards. It does not represent current FY2026/FY2027 annual coding updates.",
+  "codes": {
+    "I10": {
+      "description": "Essential (primary) hypertension",
+      "category": "Diseases of the circulatory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["hypertension", "essential hypertension", "high blood pressure", "htn"],
+      "is_unspecified": false
+    },
+    "I25.10": {
+      "description": "Atherosclerotic heart disease of native coronary artery without angina pectoris",
+      "category": "Diseases of the circulatory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["coronary artery disease", "cad", "atherosclerotic heart disease", "ashd"],
+      "is_unspecified": true,
+      "specific_alternatives": ["I25.110", "I25.111", "I25.118", "I25.119"]
+    },
+    "E11.9": {
+      "description": "Type 2 diabetes mellitus without complications",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "code_set_year": "FY 2024",
+      "keywords": ["type 2 diabetes", "t2dm", "diabetes mellitus", "adult onset diabetes", "dm2", "hyperglycemia", "diabetic"],
+      "is_unspecified": false
+    },
+    "E11.65": {
+      "description": "Type 2 diabetes mellitus with hyperglycemia",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "code_set_year": "FY 2024",
+      "keywords": ["type 2 diabetes with hyperglycemia", "t2dm uncontrolled", "diabetic hyperglycemia", "elevated blood sugar"],
+      "is_unspecified": false
+    },
+    "E11.22": {
+      "description": "Type 2 diabetes mellitus with diabetic chronic kidney disease",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "code_set_year": "FY 2024",
+      "keywords": ["diabetic nephropathy", "t2dm ckd", "diabetic chronic kidney disease"],
+      "is_unspecified": false
+    },
+    "E78.5": {
+      "description": "Hyperlipidemia, unspecified",
+      "category": "Endocrine, nutritional and metabolic diseases",
+      "code_set_year": "FY 2024",
+      "keywords": ["hyperlipidemia", "high cholesterol", "dyslipidemia", "elevated lipids"],
+      "is_unspecified": true,
+      "specific_alternatives": ["E78.00", "E78.1", "E78.2", "E78.49"]
+    },
+    "J45.909": {
+      "description": "Unspecified asthma, uncomplicated",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["asthma", "bronchial asthma", "wheezing", "reactive airway disease"],
+      "is_unspecified": true,
+      "specific_alternatives": ["J45.20", "J45.30", "J45.40", "J45.50"]
+    },
+    "J45.40": {
+      "description": "Moderate persistent asthma, uncomplicated",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["moderate persistent asthma", "moderate asthma"],
+      "is_unspecified": false
+    },
+    "J06.9": {
+      "description": "Acute upper respiratory infection, unspecified",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["upper respiratory infection", "uri", "common cold", "head cold", "viral uri"],
+      "is_unspecified": true
+    },
+    "J02.9": {
+      "description": "Acute pharyngitis, unspecified",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["pharyngitis", "sore throat", "acute pharyngitis"],
+      "is_unspecified": true,
+      "specific_alternatives": ["J02.0"]
+    },
+    "J18.9": {
+      "description": "Pneumonia, unspecified organism",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["pneumonia", "community acquired pneumonia", "cap", "lung infiltrate"],
+      "is_unspecified": true
+    },
+    "K21.9": {
+      "description": "Gastro-esophageal reflux disease without esophagitis",
+      "category": "Diseases of the digestive system",
+      "code_set_year": "FY 2024",
+      "keywords": ["gerd", "acid reflux", "gastroesophageal reflux", "heartburn"],
+      "is_unspecified": false
+    },
+    "K52.9": {
+      "description": "Noninfective gastroenteritis and colitis, unspecified",
+      "category": "Diseases of the digestive system",
+      "code_set_year": "FY 2024",
+      "keywords": ["gastroenteritis", "colitis", "diarrhea", "stomach flu"],
+      "is_unspecified": true
+    },
+    "M17.9": {
+      "description": "Osteoarthritis of knee, unspecified",
+      "category": "Diseases of the musculoskeletal system",
+      "code_set_year": "FY 2024",
+      "keywords": ["osteoarthritis knee", "knee arthritis", "degenerative joint disease knee", "knee djd", "gonarthrosis"],
+      "is_unspecified": true,
+      "specific_alternatives": ["M17.11", "M17.12"]
+    },
+    "M17.11": {
+      "description": "Unilateral primary osteoarthritis, right knee",
+      "category": "Diseases of the musculoskeletal system",
+      "code_set_year": "FY 2024",
+      "keywords": ["right knee osteoarthritis", "right knee arthritis", "primary oa right knee"],
+      "is_unspecified": false
+    },
+    "M17.12": {
+      "description": "Unilateral primary osteoarthritis, left knee",
+      "category": "Diseases of the musculoskeletal system",
+      "code_set_year": "FY 2024",
+      "keywords": ["left knee osteoarthritis", "left knee arthritis", "primary oa left knee"],
+      "is_unspecified": false
+    },
+    "M54.50": {
+      "description": "Low back pain, unspecified",
+      "category": "Diseases of the musculoskeletal system",
+      "code_set_year": "FY 2024",
+      "keywords": ["low back pain", "lumbago", "lumbar back pain", "lbp"],
+      "is_unspecified": true
+    },
+    "N39.0": {
+      "description": "Urinary tract infection, site not specified",
+      "category": "Diseases of the genitourinary system",
+      "code_set_year": "FY 2024",
+      "keywords": ["urinary tract infection", "uti", "bladder infection", "dysuria"],
+      "is_unspecified": true
+    },
+    "R07.9": {
+      "description": "Chest pain, unspecified",
+      "category": "Symptoms, signs and abnormal clinical and laboratory findings",
+      "code_set_year": "FY 2024",
+      "keywords": ["chest pain", "atypical chest pain", "precordial pain", "substernal pain"],
+      "is_unspecified": true
+    },
+    "R05.9": {
+      "description": "Cough, unspecified",
+      "category": "Symptoms, signs and abnormal clinical and laboratory findings",
+      "code_set_year": "FY 2024",
+      "keywords": ["cough", "chronic cough", "dry cough", "productive cough"],
+      "is_unspecified": true
+    },
+    "R53.83": {
+      "description": "Other fatigue",
+      "category": "Symptoms, signs and abnormal clinical and laboratory findings",
+      "code_set_year": "FY 2024",
+      "keywords": ["fatigue", "tiredness", "exhaustion", "lethargy"],
+      "is_unspecified": false
+    },
+    "Z00.00": {
+      "description": "Encounter for general adult medical examination without abnormal findings",
+      "category": "Factors influencing health status and contact with health services",
+      "code_set_year": "FY 2024",
+      "keywords": ["annual checkup", "preventive exam", "routine physical", "well adult visit", "wellness exam"],
+      "is_unspecified": false
+    },
+    "Z12.11": {
+      "description": "Encounter for screening for malignant neoplasm of colon",
+      "category": "Factors influencing health status and contact with health services",
+      "code_set_year": "FY 2024",
+      "keywords": ["colonoscopy screening", "colon cancer screening", "screening colonoscopy"],
+      "is_unspecified": false
+    },
+    "Z23": {
+      "description": "Encounter for immunization",
+      "category": "Factors influencing health status and contact with health services",
+      "code_set_year": "FY 2024",
+      "keywords": ["vaccine", "immunization", "flu shot", "vaccination"],
+      "is_unspecified": false
+    },
+    "J20.9": {
+      "description": "Acute bronchitis, unspecified",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["acute bronchitis", "bronchitis", "chest cold"],
+      "is_unspecified": true
+    },
+    "J30.9": {
+      "description": "Allergic rhinitis, unspecified",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["allergic rhinitis", "allergies", "hay fever", "seasonal allergies"],
+      "is_unspecified": true
+    },
+    "D48.5": {
+      "description": "Neoplasm of uncertain behavior of skin",
+      "category": "Neoplasms",
+      "code_set_year": "FY 2024",
+      "keywords": ["skin lesion", "skin neoplasm", "uncertain skin lesion", "biopsy skin"],
+      "is_unspecified": false
+    },
+    "J45.51": {
+      "description": "Severe persistent asthma with (acute) exacerbation",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["severe asthma", "asthma exacerbation", "severe persistent asthma"],
+      "is_unspecified": false
+    },
+    "S83.201A": {
+      "description": "Tear of meniscus, current right knee, initial encounter",
+      "category": "Injury, poisoning and certain other consequences of external causes",
+      "code_set_year": "FY 2024",
+      "keywords": ["meniscus tear", "knee tear", "torn meniscus", "right knee meniscus"],
+      "is_unspecified": false
+    },
+    "J44.9": {
+      "description": "Chronic obstructive pulmonary disease, unspecified",
+      "category": "Diseases of the respiratory system",
+      "code_set_year": "FY 2024",
+      "keywords": ["copd", "chronic obstructive pulmonary disease", "chronic bronchitis"],
+      "is_unspecified": true
+    },
+    "F41.1": {
+      "description": "Generalized anxiety disorder",
+      "category": "Mental, Behavioral and Neurodevelopmental disorders",
+      "code_set_year": "FY 2024",
+      "keywords": ["generalized anxiety disorder", "gad", "anxiety", "chronic anxiety"],
+      "is_unspecified": false
+    }
+  }
+}

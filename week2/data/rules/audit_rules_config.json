@@ -1,0 +1,39 @@
+{
+  "audit_version": "1.0.0",
+  "rules_version": "2024.1 (Historical Reference Standard)",
+  "code_set_disclosure": "Historical Reference Version: Uses ICD-10-CM FY2024 and CPT 2024 Educational Reference Subsets. Does not represent current FY2026/FY2027 annual coding updates.",
+  "standard_citations": {
+    "missing_diagnosis_support": "ICD-10-CM Official Guidelines for Coding and Reporting FY 2024, Section I.B.1: The importance of consistent, complete documentation in the medical record cannot be overemphasized. Conditions not documented in the medical record by the provider must not be assigned.",
+    "code_diagnosis_mismatch": "ICD-10-CM Official Guidelines for Coding and Reporting FY 2024, Section I.A.19: Code assignment is based on the documentation by the attending healthcare provider.",
+    "unspecified_code_usage": "ICD-10-CM Official Guidelines for Coding and Reporting FY 2024, Section I.B.18: Sign/symptom/unspecified codes should be reported when a more specific diagnosis cannot be made. When a specific diagnosis is documented, the specific code must be selected.",
+    "duplicate_diagnosis": "CMS Medicare Claims Processing Manual (Pub. 100-04) Chapter 23 §10: Guidelines on Fee Schedule Administration; duplicate or redundant diagnostic lines for the same encounter create claim adjudication rejections and scrub errors.",
+    "unsupported_procedure": "Social Security Act §1862(a)(1)(A) & CMS Medicare Benefit Policy Manual (Pub. 100-02) Chapter 15 §20: No payment may be made for expenses incurred for items or services which are not reasonable and necessary for the diagnosis or treatment of illness or injury.",
+    "missing_procedure_documentation": "CMS Medicare Program Integrity Manual (Pub. 100-08) Chapter 3 §3.3.2.4 & AMA CPT Instructions: Every reported procedural CPT code must be supported by an authentic operative or diagnostic procedure report.",
+    "incomplete_clinical_notes": "Medicare Program Integrity Manual (Pub. 100-08) Chapter 3 §3.3.2.4: Medical documentation must contain sufficient clinical detail to support the level of care and medical necessity billed.",
+    "missing_provider_signature": "CMS Medicare Learning Network (MLN) Matters Article MM6698: Signature Guidelines for Medical Review; medical record documentation requires a valid handwritten or compliant electronic signature by the authoring clinician.",
+    "high_level_em_underdocumented": "AMA CPT 2024 E/M Guidelines & CMS 2021/2023 Outpatient E/M Documentation Revisions: Level 5 office visits (99215/99205) require either high-complexity Medical Decision Making (MDM) or documented total encounter time (40-54 minutes for 99215).",
+    "unverified_code_manual_check": "ICD-10-CM Official Guidelines Section I.A.19 & AMA CPT Instructions: Reported diagnostic and procedural codes must be verified against current official tabular indices before claim generation."
+  },
+  "documentation_thresholds": {
+    "min_note_word_count_standard": 15,
+    "min_note_word_count_high_em": 45,
+    "signature_keywords": [
+      "electronically signed",
+      "authenticated by",
+      "signed by",
+      "provider signature",
+      "dr.",
+      "m.d.",
+      "d.o.",
+      "np",
+      "pa-c",
+      "attending physician",
+      "physician signature"
+    ]
+  },
+  "severity_definitions": {
+    "High": "Potential compliance audit failure, overpayment risk, or critical medical necessity deficiency requiring mandatory human auditor review before claim submission.",
+    "Medium": "Documentation gap, missing element, or potential coding query candidate requiring review and possible provider addendum.",
+    "Low": "Informational coding optimization, unspecified code warning, or minor administrative discrepancy."
+  }
+}

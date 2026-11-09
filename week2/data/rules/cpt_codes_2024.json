@@ -1,0 +1,160 @@
+{
+  "version": "CPT 2024 (Historical Educational Reference Subset)",
+  "code_set_year": "2024 (Historical)",
+  "source": "American Medical Association (AMA) Educational Standard Reference",
+  "last_updated": "2024-01-01",
+  "disclaimer": "Historical Reference Notice: CPT codes and descriptions are copyright American Medical Association. This historical educational subset is presented strictly for simulated compliance auditing training and does not claim current annual coding compliance.",
+  "codes": {
+    "99211": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, not requiring presence of physician or QHP",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 1,
+      "typical_time_minutes": 5,
+      "requires_mdm_or_time": false,
+      "requires_procedure_note": false,
+      "keywords": ["nurse visit", "refill", "bp check", "triage", "dressing change"]
+    },
+    "99212": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, straightforward MDM or 10-19 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 2,
+      "typical_time_minutes": 10,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "keywords": ["minor complaint", "straightforward", "routine followup"]
+    },
+    "99213": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, low level MDM or 20-29 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 3,
+      "typical_time_minutes": 20,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "keywords": ["stable chronic illness", "acute uncomplicated illness", "routine management"]
+    },
+    "99214": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, moderate level MDM or 30-39 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 4,
+      "typical_time_minutes": 30,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "keywords": ["two or more stable chronic illnesses", "uncontrolled chronic condition", "prescription drug management"]
+    },
+    "99215": {
+      "description": "Office or other outpatient visit for evaluation and management of established patient, high level MDM or 40-54 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 5,
+      "typical_time_minutes": 40,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "min_documentation_words": 60,
+      "keywords": ["high risk", "severe exacerbation", "high complexity mdm", "decision regarding hospitalization", "threat to life or bodily function"]
+    },
+    "99203": {
+      "description": "Office or other outpatient visit for evaluation and management of new patient, low level MDM or 30-44 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 3,
+      "typical_time_minutes": 30,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "keywords": ["new patient", "low complexity"]
+    },
+    "99204": {
+      "description": "Office or other outpatient visit for evaluation and management of new patient, moderate level MDM or 45-59 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 4,
+      "typical_time_minutes": 45,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "keywords": ["new patient", "moderate complexity"]
+    },
+    "99205": {
+      "description": "Office or other outpatient visit for evaluation and management of new patient, high level MDM or 60-74 minutes",
+      "category": "Evaluation and Management (E/M)",
+      "code_set_year": "2024",
+      "level": 5,
+      "typical_time_minutes": 60,
+      "requires_mdm_or_time": true,
+      "requires_procedure_note": false,
+      "min_documentation_words": 70,
+      "keywords": ["new patient", "high complexity"]
+    },
+    "93000": {
+      "description": "Electrocardiogram, routine ECG with at least 12 leads; with interpretation and report",
+      "category": "Cardiovascular Procedures",
+      "code_set_year": "2024",
+      "requires_procedure_note": true,
+      "keywords": ["ecg", "ekg", "electrocardiogram", "12-lead", "cardiac rhythm"],
+      "compatible_diagnoses": ["I10", "I25.10", "R07.9", "R53.83"]
+    },
+    "71046": {
+      "description": "Radiologic examination, chest; 2 views",
+      "category": "Diagnostic Radiology",
+      "code_set_year": "2024",
+      "requires_procedure_note": true,
+      "keywords": ["chest x-ray", "cxr", "chest radiograph", "2 view chest"],
+      "compatible_diagnoses": ["J18.9", "J45.909", "J45.40", "R07.9", "R05.9"]
+    },
+    "45378": {
+      "description": "Colonoscopy, flexible; diagnostic, including collection of specimen(s) by brushing or washing, when performed",
+      "category": "Digestive System Procedures",
+      "code_set_year": "2024",
+      "requires_procedure_note": true,
+      "keywords": ["colonoscopy", "cecum reached", "colonoscope", "bowel prep", "endoscopy"],
+      "compatible_diagnoses": ["Z12.11", "K52.9"]
+    },
+    "36415": {
+      "description": "Routine venipuncture (blood draw)",
+      "category": "Pathology and Laboratory",
+      "code_set_year": "2024",
+      "requires_procedure_note": false,
+      "keywords": ["venipuncture", "blood draw", "phlebotomy", "specimen collection"]
+    },
+    "80053": {
+      "description": "Comprehensive metabolic panel (CMP)",
+      "category": "Pathology and Laboratory",
+      "code_set_year": "2024",
+      "requires_procedure_note": false,
+      "keywords": ["cmp", "comprehensive metabolic panel", "metabolic panel", "serum electrolytes"]
+    },
+    "85025": {
+      "description": "Blood count; complete (CBC) automated with differential",
+      "category": "Pathology and Laboratory",
+      "code_set_year": "2024",
+      "requires_procedure_note": false,
+      "keywords": ["cbc", "complete blood count", "hemogram", "leukocyte count"]
+    },
+    "99395": {
+      "description": "Periodic comprehensive preventive medicine reevaluation and management; established patient, 18-39 years",
+      "category": "Preventive Medicine",
+      "code_set_year": "2024",
+      "requires_procedure_note": false,
+      "keywords": ["preventive visit", "annual exam", "routine physical", "wellness visit"],
+      "compatible_diagnoses": ["Z00.00"]
+    },
+    "99396": {
+      "description": "Periodic comprehensive preventive medicine reevaluation and management; established patient, 40-64 years",
+      "category": "Preventive Medicine",
+      "code_set_year": "2024",
+      "requires_procedure_note": false,
+      "keywords": ["preventive visit", "annual physical", "wellness exam"],
+      "compatible_diagnoses": ["Z00.00"]
+    },
+    "11102": {
+      "description": "Tangential biopsy of skin (eg, shave, scoop, saucerize, curette); single lesion",
+      "category": "Integumentary System Procedures",
+      "code_set_year": "2024",
+      "requires_procedure_note": true,
+      "keywords": ["shave biopsy", "biopsy", "tangential biopsy", "skin lesion"],
+      "compatible_diagnoses": ["D48.5", "L98.9", "D22.9"]
+    }
+  }
+}

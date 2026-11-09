@@ -1,0 +1,37 @@
+==============================================================================
+METROPOLITAN OUTPATIENT MEDICAL GROUP, P.C.
+100 Medical Center Blvd, Suite 200 | Phone: (555) 019-2830
+==============================================================================
+PATIENT BILLING STATEMENT / SUMMARY INVOICE
+------------------------------------------------------------------------------
+Statement Number : INV-2001
+Statement Date   : November 09, 2026
+Payment Due Date : December 09, 2026
+Account Status   : BALANCE DUE
+------------------------------------------------------------------------------
+PATIENT INFORMATION:
+  Patient Name   : Johnathan Miller (ID: PT-9101)
+  Billing Address: 100 Medical Center Blvd, Suite 200
+  Encounter ID   : ENC-2001 | Date of Service: 2024-04-02
+------------------------------------------------------------------------------
+ITEMIZED CHARGES & INSURANCE ADJUDICATION:
+Description                                 Billed   Adj/Disc   Ins Paid   Pt Due
+------------------------------------------------------------------------------
+99213 - Office or other outpatient vis   $  185.00 $    70.00 $     0.00 $ 115.00
+------------------------------------------------------------------------------
+ACCOUNT SUMMARY & BALANCE BREAKDOWN:
+  Total Billed Charges            : $   185.00
+  Less: Insurance Write-Offs / Adj: $    70.00
+  Less: Insurance Payments Received: $     0.00
+  --------------------------------------------------
+  Patient Copayment Required      : $    30.00
+  Patient Deductible Applied      : $    85.00
+  Patient Coinsurance Required    : $     0.00
+  ==================================================
+  TOTAL BALANCE DUE FROM PATIENT  : $   115.00
+==============================================================================
+PAYMENT NOTICE & REGULATORY DISCLAIMER:
+• Payment is due within 30 days of statement date via portal, phone, or mail.
+• Educational Notice: This document is a simulated educational invoice created for
+  internship workflow demonstration. Does not reflect real patient debt or actual bills.
+==============================================================================

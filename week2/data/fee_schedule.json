@@ -1,0 +1,160 @@
+{
+  "version": "2024.1 (Simulation Assumption)",
+  "disclaimer": "Simulated Chargemaster rates and in-network payer allowed amounts. Created strictly for educational billing demonstration.",
+  "items": {
+    "99213": {
+      "cpt": "99213",
+      "description": "Office or other outpatient visit, established patient, low-to-moderate MDM (20-29 mins)",
+      "category": "E/M Established",
+      "gross_charge": 185.00,
+      "allowed_amounts": {
+        "BCBS001": 115.00,
+        "UHC002": 110.00,
+        "AETNA003": 108.00,
+        "CMS001": 92.05,
+        "CIGNA005": 112.00,
+        "DEFAULT": 105.00
+      }
+    },
+    "99214": {
+      "cpt": "99214",
+      "description": "Office or other outpatient visit, established patient, moderate MDM (30-39 mins)",
+      "category": "E/M Established",
+      "gross_charge": 275.00,
+      "allowed_amounts": {
+        "BCBS001": 165.00,
+        "UHC002": 160.00,
+        "AETNA003": 155.00,
+        "CMS001": 138.50,
+        "CIGNA005": 158.00,
+        "DEFAULT": 150.00
+      }
+    },
+    "99215": {
+      "cpt": "99215",
+      "description": "Office or other outpatient visit, established patient, high MDM (40-54 mins)",
+      "category": "E/M Established",
+      "gross_charge": 395.00,
+      "allowed_amounts": {
+        "BCBS001": 230.00,
+        "UHC002": 225.00,
+        "AETNA003": 220.00,
+        "CMS001": 192.40,
+        "CIGNA005": 222.00,
+        "DEFAULT": 210.00
+      }
+    },
+    "99203": {
+      "cpt": "99203",
+      "description": "Office or other outpatient visit, new patient, low-to-moderate MDM (30-44 mins)",
+      "category": "E/M New",
+      "gross_charge": 245.00,
+      "allowed_amounts": {
+        "BCBS001": 150.00,
+        "UHC002": 145.00,
+        "AETNA003": 140.00,
+        "CMS001": 122.30,
+        "CIGNA005": 142.00,
+        "DEFAULT": 135.00
+      }
+    },
+    "99204": {
+      "cpt": "99204",
+      "description": "Office or other outpatient visit, new patient, moderate MDM (45-59 mins)",
+      "category": "E/M New",
+      "gross_charge": 360.00,
+      "allowed_amounts": {
+        "BCBS001": 215.00,
+        "UHC002": 210.00,
+        "AETNA003": 205.00,
+        "CMS001": 178.60,
+        "CIGNA005": 208.00,
+        "DEFAULT": 200.00
+      }
+    },
+    "99396": {
+      "cpt": "99396",
+      "description": "Preventive medicine evaluation and management, established patient, age 40-64",
+      "category": "Preventive",
+      "gross_charge": 310.00,
+      "allowed_amounts": {
+        "BCBS001": 195.00,
+        "UHC002": 190.00,
+        "AETNA003": 185.00,
+        "CMS001": 0.00,
+        "CIGNA005": 188.00,
+        "DEFAULT": 180.00
+      }
+    },
+    "36415": {
+      "cpt": "36415",
+      "description": "Routine venipuncture (blood draw)",
+      "category": "Laboratory / Phlebotomy",
+      "gross_charge": 35.00,
+      "allowed_amounts": {
+        "BCBS001": 18.00,
+        "UHC002": 16.00,
+        "AETNA003": 15.00,
+        "CMS001": 12.00,
+        "CIGNA005": 16.50,
+        "DEFAULT": 15.00
+      }
+    },
+    "71046": {
+      "cpt": "71046",
+      "description": "Radiologic examination, chest; 2 views",
+      "category": "Diagnostic Radiology",
+      "gross_charge": 175.00,
+      "allowed_amounts": {
+        "BCBS001": 85.00,
+        "UHC002": 80.00,
+        "AETNA003": 78.00,
+        "CMS001": 58.40,
+        "CIGNA005": 82.00,
+        "DEFAULT": 75.00
+      }
+    },
+    "93000": {
+      "cpt": "93000",
+      "description": "Electrocardiogram, routine ECG with at least 12 leads; with interpretation and report",
+      "category": "Diagnostic Cardiology",
+      "gross_charge": 120.00,
+      "allowed_amounts": {
+        "BCBS001": 65.00,
+        "UHC002": 62.00,
+        "AETNA003": 60.00,
+        "CMS001": 44.50,
+        "CIGNA005": 62.00,
+        "DEFAULT": 58.00
+      }
+    },
+    "45378": {
+      "cpt": "45378",
+      "description": "Colonoscopy, flexible; diagnostic, including collection of specimen(s)",
+      "category": "Endoscopy",
+      "gross_charge": 1450.00,
+      "allowed_amounts": {
+        "BCBS001": 620.00,
+        "UHC002": 600.00,
+        "AETNA003": 590.00,
+        "CMS001": 415.80,
+        "CIGNA005": 610.00,
+        "DEFAULT": 550.00
+      }
+    },
+    "11102": {
+      "cpt": "11102",
+      "description": "Tangential biopsy of skin (eg, shave, scoop, saucerize, curette); single lesion",
+      "category": "Minor Surgery",
+      "gross_charge": 220.00,
+      "allowed_amounts": {
+        "BCBS001": 125.00,
+        "UHC002": 120.00,
+        "AETNA003": 118.00,
+        "CMS001": 98.20,
+        "CIGNA005": 122.00,
+        "DEFAULT": 115.00
+      }
+    }
+  }
+}
